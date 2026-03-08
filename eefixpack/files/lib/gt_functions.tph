@@ -104,6 +104,221 @@ BEGIN
 	END
 END
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// A patch function that sorts IDS table entries numerically in ascending order.
+// Notation of numeric values (decimal/hexadecimal) is preserved.
+// Applies a stable sort which preserves relative order of duplicate IDS entries.
+// Entries are also cleaned up by removing excessive whitespace.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+DEFINE_PATCH_FUNCTION sort_ids
+BEGIN
+  // detecting newline type (windows or unix)
+  PATCH_IF (INDEX_BUFFER(~%WNL%~) >= 0) BEGIN
+    SPRINT nl ~%WNL%~
+  END ELSE BEGIN
+    SPRINT nl ~%LNL%~
+  END
+
+  // parsing table entries
+  SET headers = 0
+  SET unparsed = 0  // some ids files contain invalid content
+  SPRINT entry_regex ~^\(\(-?[0-9]+\)\|\(-?0x[0-9a-f]+\)\)[ %TAB%]+\(.+\)~ // group 1: value; group 4: symbol
+  FOR (pos1 = 0 pos2 = 0 row = 0; pos1 >= 0 && pos2 >= 0; row += 1) BEGIN
+    SET pos2 = INDEX_BUFFER(~[%WNL%]~ pos1)
+    // needed if last line doesn't end with a newline
+    SET pos2 = (pos2 < 0) ? BUFFER_LENGTH : pos2
+    PATCH_IF (pos2 >= pos1) BEGIN
+      READ_ASCII pos1 line (pos2 - pos1)
+
+      // trimming whitespace
+      INNER_PATCH_SAVE line ~%line%~ BEGIN REPLACE_TEXTUALLY ~^[ %TAB%]+~ ~~ REPLACE_TEXTUALLY ~[ %TAB%]+$~ ~~ END
+
+      SET is_entry = (~%line%~ STRING_MATCHES_REGEXP ~%entry_regex%~ == 0)
+      SET is_header = (row < 2 && NOT is_entry)
+
+      PATCH_IF (is_header) BEGIN
+        // processing table header
+        SPRINT $headers(~%headers%~) ~%line%~
+        SET headers += 1
+      END ELSE PATCH_IF (is_entry) BEGIN
+        // processing table entry
+        INNER_PATCH_SAVE token1 ~%line%~ BEGIN REPLACE_TEXTUALLY ~%entry_regex%~ ~\1~ END
+        INNER_PATCH_SAVE token2 ~%line%~ BEGIN REPLACE_TEXTUALLY ~%entry_regex%~ ~\4~ END
+        SET signed = (~%token1%~ STRING_MATCHES_REGEXP ~^-.*~ == 0)
+        PATCH_IF (IS_AN_INT ~token1~) BEGIN
+          SET value = token1
+          SET is_hex = (~%token1%~ STRING_MATCHES_REGEXP ~-?0x.+~ == 0)
+          SET digits = is_hex ? STRING_LENGTH ~%token1%~ - 2 : 0
+          SET digits = (is_hex && signed) ? digits - 1 : digits
+          SET sym_count = VARIABLE_IS_SET $ids(~%value%~ ~count~) ? $ids(~%value%~ ~count~) : 0
+          SPRINT $ids(~%value%~ ~%sym_count%~) ~%token2%~
+          SET $ids(~%value%~ ~hex~) = is_hex
+          SET $ids(~%value%~ ~digits~) = digits
+          SET $ids(~%value%~ ~count~) = sym_count + 1
+
+          // hex notation is needed to prevent overflow of big integers
+          LPF get_formatted_hex INT_VAR value digits = 8 RET result END
+          PATCH_IF (signed) BEGIN
+            SPRINT result ~-%result%~
+          END
+          // only array index is relevant
+          SET $ref(~%result%~) = 1
+        END
+      END ELSE PATCH_IF (NOT ~%line%~ STR_EQ ~~) BEGIN
+        // preserve unparsed data
+        SPRINT $unparsed(~%unparsed%~) ~%line%~
+        SET unparsed += 1
+      END
+
+      SET pos1 = INDEX_BUFFER(~[^%WNL%]~ pos2)
+    END
+  END
+
+  // discarding old content
+  SET ofs = 0
+  DELETE_BYTES ofs BUFFER_LENGTH
+
+  // writing sorted entries
+  // headers
+  FOR (i = 0; i < headers; ++i) BEGIN
+    SPRINT line $headers(~%i%~)
+    SPRINT line ~%line%%nl%~
+    SET line_len = STRING_LENGTH ~%line%~
+    INSERT_BYTES ofs line_len
+    WRITE_ASCIIE ofs ~%line%~ (line_len)
+    SET ofs += line_len
+  END
+
+  // Sorting indices in hex notation is better done lexicographically to prevent sorting errors because of overflow.
+  SORT_ARRAY_INDICES ~ref~ LEXICOGRAPHICALLY
+
+  // table entries
+  PHP_EACH ref AS index => _ BEGIN
+    // removing sign if needed
+    INNER_PATCH_SAVE index ~%index%~ BEGIN
+      READ_BYTE 0 sign
+      PATCH_IF (sign == 45) BEGIN
+        DELETE_BYTES 0 1
+      END
+    END
+
+    SET value = index
+    SET count = $ids(~%value%~ ~count~)
+    SET is_hex = $ids(~%value%~ ~hex~)
+    SET digits = $ids(~%value%~ ~digits~)
+
+    PATCH_IF (is_hex) BEGIN
+      LPF get_formatted_hex INT_VAR value digits RET first = result END
+    END ELSE BEGIN
+      SET first = value
+    END
+
+    FOR (i = 0; i < count; ++i) BEGIN
+      SPRINT second $ids(~%value%~ ~%i%~)
+      SPRINT line ~%first% %second%%nl%~
+      SET line_len = STRING_LENGTH ~%line%~
+      INSERT_BYTES ofs line_len
+      WRITE_ASCIIE ofs ~%line%~ (line_len)
+      SET ofs += line_len
+    END
+  END
+
+  // unparsed data
+  FOR (i = 0; i < unparsed; ++i) BEGIN
+    SPRINT line $unparsed(~%i%~)
+    SPRINT line ~%line%%nl%~
+    SET line_len = STRING_LENGTH ~%line%~
+    INSERT_BYTES ofs line_len
+    WRITE_ASCIIE ofs ~%line%~ (line_len)
+    SET ofs += line_len
+  END
+END
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Converts a number from decimal notation into hexadecimal notation with "0x" prefix
+// and a minimum number of digits.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+DEFINE_PATCH_FUNCTION get_formatted_hex
+INT_VAR
+  value    = 0  // numeric value to convert into hexadecimal representation
+  digits   = 0  // minimum number of digits
+  to_upper = 1  // whether extended digits (a..f) are printed in capital letters
+RET
+  result        // resulting hexadecimal representation of "value"
+BEGIN
+  SPRINTF result "%x" (value)
+  PATCH_IF (to_upper) BEGIN
+    TO_UPPER ~result~
+  END
+  SET result_len = STRING_LENGTH ~%result%~
+  SET digits = digits + 2 - result_len
+  INNER_PATCH_SAVE result ~%result%~ BEGIN
+    WRITE_ASCII 0 ~0x~ (2)  // prefix in lowercase
+    FOR (i = 0; i < digits; ++i) BEGIN
+      INSERT_BYTES 2 1
+      WRITE_BYTE 2 48 // ASCII "0"
+    END
+  END
+END
+
+//////////////////////////////////////////////////////////
+/////// TO_HEX_NUMBER (borrowed from Argent77)
+//////////////////////////////////////////////////////////
+
+/*
+** Converts any decimal number into a hexadecimal number
+*/
+
+DEFINE_DIMORPHIC_FUNCTION ~TO_HEX_NUMBER~
+INT_VAR
+	~value~     = 0   // the decimal number
+	~minDigits~ = 1   // min. number of digits in return value (not counting sign)
+	~prefix~    = 0   // whether to return number with "0x" prefix
+	~signed~    = 1   // whether number is treated as a signed number
+	~upperCase~ = 0   // whether to represent alphabetic digits in upper case
+RET
+	~hexNumber~       // returned as string without prefix
+BEGIN
+	ACTION_IF (~%minDigits%~ < 1) BEGIN
+		OUTER_SET ~minDigits~ = 1
+	END
+	ACTION_IF ("%minDigits%" > 8) BEGIN
+		OUTER_SET ~minDigits~ = 8
+	END
+	OUTER_TEXT_SPRINT ~hexNumber~ ~~
+	ACTION_DEFINE_ARRAY ~digit~ BEGIN ~0~ ~1~ ~2~ ~3~ ~4~ ~5~ ~6~ ~7~ ~8~ ~9~ ~a~ ~b~ ~c~ ~d~ ~e~ ~f~ END
+
+	ACTION_IF ("%signed%" && "%value%" < 0) BEGIN
+		OUTER_SET ~isSigned~ = 1
+		OUTER_SET ~value~ = 0 - "%value%"
+	END ELSE BEGIN
+		OUTER_SET ~isSigned~ = 0
+	END
+
+	OUTER_WHILE ("%value%" != 0) BEGIN
+		OUTER_SET ~curDigit~ = "%value%" BAND 0xf
+		OUTER_SET ~value~ = "%value%" BLSR 4
+		OUTER_TEXT_SPRINT ~hexDigit~ $~digit~(~%curDigit%~)
+		OUTER_TEXT_SPRINT ~hexNumber~ ~%hexDigit%%hexNumber%~
+	END
+
+	OUTER_WHILE (STRING_LENGTH ~%hexNumber%~ < "%minDigits%") BEGIN
+		OUTER_TEXT_SPRINT ~hexNumber~ ~0%hexNumber%~
+	END
+
+	ACTION_IF ("%upperCase%") BEGIN
+		ACTION_TO_UPPER ~hexNumber~
+	END
+
+	ACTION_IF ("%prefix%") BEGIN
+		OUTER_TEXT_SPRINT ~hexNumber~ ~0x%hexNumber%~
+	END
+
+	ACTION_IF ("%isSigned%") BEGIN
+		OUTER_TEXT_SPRINT ~hexNumber~ ~-%hexNumber%~
+	END
+END
+
 //////////////////////////////////////////////////////////
 /////// ADD_SPLPROT_ENTRY (borrowed from Argent77)
 //////////////////////////////////////////////////////////
@@ -133,8 +348,12 @@ BEGIN
 	OUTER_SET "index" = "-1"
 	// Main
 	ACTION_IF ("%stat%" >= 0) BEGIN
-		OUTER_PATCH "" BEGIN
-			SPRINTF "valueHex" "%x" ("%stat%")
+		LAF "TO_HEX_NUMBER"
+		INT_VAR
+			"value" = "%stat%"
+			"prefix" = 1
+		RET
+			"valueHex" = "hexNumber"
 		END
 		ACTION_IF (~%value%~ STRING_EQUAL ~~) BEGIN
 			OUTER_TEXT_SPRINT "value" ~*~
@@ -255,10 +474,13 @@ BEGIN
 			// Adding new entry
 			ACTION_IF ("%value%" != "-1") BEGIN
 				ACTION_IF ("%hexadecimal%") BEGIN
-					OUTER_PATCH "" BEGIN
-						SPRINTF "idsValue" "%x" ("%value%")
-						TO_UPPER "idsValue"
+					LAF "TO_HEX_NUMBER"
+					INT_VAR
+						"value"
+					RET
+						"hexNumber"
 					END
+					OUTER_TEXT_SPRINT ~idsValue~ ~0x%hexNumber%~
 				END ELSE BEGIN
 					OUTER_TEXT_SPRINT ~idsValue~ ~%value%~
 				END
@@ -355,17 +577,17 @@ BEGIN
 	// Initialize
 	OUTER_TEXT_SPRINT "list_out" "%list_in%"
 	// Find the first instance of "%separator%"
-	OUTER_SET "found" = INDEX (CASE_INSENSITIVE EXACT_MATCH "%separator%" "%list_in%")
-	ACTION_IF ("%found%" == "-1") BEGIN
+	OUTER_SET "x" = INDEX (CASE_INSENSITIVE EXACT_MATCH "%separator%" "%list_in%")
+	ACTION_IF ("%x%" == "-1") BEGIN
 		// If it can't find "%separator%", then this is the last entry => Find end of string
-		OUTER_SET "found" = INDEX (CASE_INSENSITIVE EVALUATE_REGEXP "$" "%list_in%")
+		OUTER_SET "x" = INDEX (CASE_INSENSITIVE EVALUATE_REGEXP "$" "%list_in%")
 		OUTER_TEXT_SPRINT "list_out" ""
 	END
-	OUTER_SET "string_length" = STRING_LENGTH "%list_in%"
+	OUTER_SET "y" = STRING_LENGTH "%list_in%"
 	// Return the first entry
 	LAF "SUBSTRING"
 	INT_VAR
-		"length" = "%found%"
+		"length" = "%x%"
 	STR_VAR
 		"string" = "%list_in%"
 	RET
@@ -375,53 +597,13 @@ BEGIN
 	ACTION_IF ("%list_out%" STRING_COMPARE_CASE "") BEGIN
 		LAF "SUBSTRING"
 		INT_VAR
-			"start" = "%found%" + STRING_LENGTH "%separator%" // we need to take into account the length of "%separator%"
-			"length" = "%string_length%" - ("%found%" + STRING_LENGTH "%separator%") // we need to take into account the length of "%separator%"
+			"start" = "%x%" + STRING_LENGTH "%separator%" // we need to take into account the length of "%separator%"
+			"length" = "%y%" - ("%x%" + STRING_LENGTH "%separator%") // we need to take into account the length of "%separator%"
 		STR_VAR
 			"string" = "%list_in%"
 		RET
 			"list_out" = "substring"
 		END
-	END
-END
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////// Return the number of times ~%element%~ appears in ~%list%~ (matching is case-insensitive)
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-DEFINE_DIMORPHIC_FUNCTION "COUNT_ELEMENT_INSTANCES"
-STR_VAR
-	"list_in" = ""
-	"element" = ""
-	"separator" = " "
-RET
-	"count"
-	"list_out"
-BEGIN
-	// Initialize
-	OUTER_SET "count" = 0
-	OUTER_TEXT_SPRINT "list_out" ""
-	// Main
-	OUTER_WHILE ("%list_in%" STRING_COMPARE_CASE "") BEGIN
-		LAF "RETURN_FIRST_ENTRY"
-		STR_VAR
-			"list_in"
-			"separator"
-		RET
-			"list_in" = "list_out"
-			"entry"
-		END
-		ACTION_IF ("%entry%" STRING_EQUAL_CASE "%element%") BEGIN
-			OUTER_SET "count" += 1
-		END ELSE BEGIN
-			OUTER_TEXT_SPRINT "list_out" "%list_out%%separator%%entry%"
-		END
-	END
-	// Remove leading ~%separator%~
-	OUTER_PATCH_SAVE "list_out" "%list_out%" BEGIN
-		REPLACE_TEXTUALLY CASE_SENSITIVE EVALUATE_REGEXP "^%separator%" ""
 	END
 END
 
@@ -455,142 +637,5 @@ BEGIN
 			"%count%" => "%entry%"
 		END
 		OUTER_SET "count" += 1
-	END
-END
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-
-De-localized (i.e., not language dependant) function to get the string corresponding to index #"%strref%"
-
-*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-DEFINE_DIMORPHIC_FUNCTION "GT_GET_STRING"
-INT_VAR
-	"strref" = 0
-RET
-	"string"
-BEGIN
-	OUTER_TEXT_SPRINT "string" ""
-	COPY - "lang\en_us\dialog.tlk" "override"
-		READ_LONG 0xE "base_off" // Offset to base data
-		READ_LONG (0x12 + 0x12 + ("%strref%" * 0x1A)) "off" // Relative offset of this string
-		READ_LONG (0x12 + 0x16 + ("%strref%" * 0x1A)) "length" // Length of this string
-		READ_ASCII ("%base_off%" + "%off%") "string" ("%length%")
-	BUT_ONLY_IF_IT_CHANGES
-END
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-
-De-localized (i.e., not language dependant) function to get the index number string corresponding to string "%string%"
-
-*/
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-DEFINE_DIMORPHIC_FUNCTION "GT_GET_STRREF"
-INT_VAR
-	"match_case" = 0 // Default: case insensitive
-STR_VAR
-	"string" = ""
-RET
-	"strref"
-BEGIN
-	// Initialize
-	OUTER_SET "strref" = "-1"
-	// Main
-	COPY - "lang\en_us\dialog.tlk" "override"
-		READ_LONG 0xE "base_off" // Offset to base data
-		FOR ("i" = 0 ; "%i%" < NEXT_STRREF ; "i" += 1) BEGIN
-			READ_LONG (0x12 + 0x12 + ("%i%" * 0x1A)) "off" // Relative offset of this string
-			READ_LONG (0x12 + 0x16 + ("%i%" * 0x1A)) "length" // Length of this string
-			READ_ASCII ("%base_off%" + "%off%") "current_string" ("%length%")
-			PATCH_IF "%match_case%" BEGIN
-				PATCH_IF ("%current_string%" STRING_EQUAL "%string%") BEGIN
-					SET "strref" = "%i%"
-					SET "i" = NEXT_STRREF // kill FOR-loop
-				END
-			END ELSE BEGIN
-				PATCH_IF ("%current_string%" STRING_EQUAL_CASE "%string%") BEGIN
-					SET "strref" = "%i%"
-					SET "i" = NEXT_STRREF // kill FOR-loop
-				END
-			END
-		END
-	BUT_ONLY_IF_IT_CHANGES
-END
-
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-
-DEFINE_PATCH_FUNCTION ~ADD_SPELL_ABILITY~
-INT_VAR
-	~type~ = 1 // Melee (should be irrelevant for `spl` files...)
-	~location~ = 4 // Ability (F13 button)
-	~target~ = 1 // Living actor
-	~#_targets~ = 0
-	~range~ = 30 // Default visual range
-	~minimum_level~ = 1
-	~casting_speed~ = 0
-	~projectile~ = IDS_OF_SYMBOL ("MISSILE" "None")
-	//
-	~copy_header~ = 0
-	~insert_point~ = ~-1~ // insert last
-STR_VAR
-	~icon~ = ~~
-RET
-	~insert_point~
-BEGIN
-	//LPF ~FJ_SPL_ITM_REINDEX~ END
-	~hs~ = 0x28
-
-	READ_LONG 0x64 ~ho~
-	READ_SHORT 0x68 ~hc~
-	READ_LONG 0x6a ~eo~
-	~insert_point~ = ("%insert_point%" > "%hc%" || "%insert_point%" < 0) ? "%hc%" : "%insert_point%"
-	~copy_header~ = ("%copy_header%" < 0) ? 0 : "%copy_header%"
-
-	PATCH_IF "%copy_header%" > "%hc%" BEGIN
-		PATCH_WARN ~Unable to copy %copy_header%th header, "%DEST_FILE%" contains only %hc% headers!~
-	END ELSE BEGIN
-		INSERT_BYTES ("%ho%" + "%insert_point%" * "%hs%") "%hs%"
-		"hc" += 1
-		"eo" += "%hs%"
-		PATCH_IF "%copy_header%" BEGIN
-			READ_SHORT ("%ho%" + ("%copy_header%" - 1) * "%hs%" + 0x1e) "ec"
-			READ_SHORT ("%ho%" + ("%copy_header%" - 1) * "%hs%" + 0x20) "ei"
-			READ_ASCII ("%eo%" + "%ei%" * 0x30) "effs" ("%ec%" * 0x30)
-			READ_ASCII ("%ho%" + ("%copy_header%" - 1) * "%hs%") "copy" ("%hs%")
-			WRITE_ASCII ("%ho%" + "%insert_point%" * "%hs%") ~%copy%~ ("%hs%")
-		END
-		WRITE_SHORT 0x68 "%hc%"
-		WRITE_LONG 0x6a "%eo%"
-
-		READ_SHORT 0x70 "ei" // technically, it is a counter
-		FOR ("i" = "%ho%" ; "%i%" < "%ho%" + "%hc%" * "%hs%" ; "i" += "%hs%") BEGIN
-			READ_SHORT "%i%" + 0x1e "ec"
-			WRITE_SHORT "%i%" + 0x20 "%ei%"
-			"ei" += "%ec%"
-		END
-
-		PATCH_IF "%copy_header%" BEGIN
-			READ_SHORT ("%ho%" + "%insert_point%" * "%hs%" + 0x1e) "ec"
-			READ_SHORT ("%ho%" + "%insert_point%" * "%hs%" + 0x20) "ei"
-			INSERT_BYTES ("%eo%" + "%ei%" * 0x30) ("%ec%" * 0x30)
-			WRITE_ASCII ("%eo%" + "%ei%" * 0x30) ~%effs%~ ("%ec%" * 0x30)
-		END ELSE BEGIN
-			"off" = "%ho%" + "%insert_point%" * "%hs%"
-			WRITE_BYTE "%off%" "%type%"
-			WRITE_SHORT ("%off%" + 0x2) "%location%"
-			WRITE_ASCII ("%off%" + 0x4) ~%icon%~ #8
-			WRITE_BYTE ("%off%" + 0xc) "%target%"
-			WRITE_BYTE ("%off%" + 0xd) "%#_targets%"
-			WRITE_SHORT ("%off%" + 0xe) "%range%"
-			WRITE_SHORT ("%off%" + 0x10) "%minimum_level%"
-			WRITE_SHORT ("%off%" + 0x12) "%casting_speed%"
-			WRITE_SHORT ("%off%" + 0x26) "%projectile%"
-		END
 	END
 END

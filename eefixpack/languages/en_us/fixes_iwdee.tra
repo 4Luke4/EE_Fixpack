@@ -2,6 +2,37 @@
 // the corresponding string in the tlk. Remember to comment why a string is being updated. Once you have legitimate
 // strings to replace, rename this file WITHOUT the underscore at the beginning. 
 
+// FoD does 2d8+1 damage on a successful save, not 2d8
+@2864 = ~The original name of this odd blade is lost in the murky depths of the Sea of Swords. Crafted of magically strengthened sahuagin bone, the weapon is believed to have been used by kuo-toa in bizarre rituals. The handle is crafted from coral wrapped in sahuagin skin. At one time, it was owned by Lockhart, a prominent adventuring thief and smuggler on the Sword Coast. It was he who gave the blade its current name.
+
+STATISTICS:
+
+Combat abilities:
+– 2% chance per hit of casting Finger of Death on target (Save vs. Spell to suffer 2d8+1 damage instead of dying)
+
+THAC0: +2
+Damage: 1d4+2 (piercing)
+Speed Factor: 1
+Proficiency Type: Dagger
+Type: One-handed
+Requires:
+ 4 Strength
+
+Weight: 1~
+
+// tenser's provides a +2 bonus to hit and damage, not just damage
+@7808 = ~Tenser's Transformation
+(Alteration, Evocation)
+
+Level: 6
+Range: 0
+Duration: 1 round/level
+Casting Time: 6
+Area of Effect: The caster
+Saving Throw: None
+
+Wizards need not always be wizards—Tenser's Transformation changes the caster into a heroic warrior, doubling the caster's Hit Points and giving <PRO_HIMHER> a +4 bonus to Armor Class, a +2 bonus to-hit and to damage, and one extra attack per round. All damage the caster sustains takes away from the bonus Hit Points first, and <PRO_HISHER> attacks have the same chance to hit as a Fighter of the same level. While transformed, the wizard cannot cast spells.~
+
 // symbol, pain is 12-ft radius; also adjusting trigger description to better match other symbol spells
 @8099 = ~Symbol, Pain
 (Conjuration/Summoning)
@@ -34,6 +65,7 @@ Weight: 3~
 
 // ie-6007, cam - see also items clbhand, kaybow, lxbowbm, cdxbowbm, storm, flailsk; strings 8663, 8911, 40639, 25818, 27373
 // Weapon damage corrections
+// adding (missile) to damage line
 @8712 = ~This bow belonged to Kaylessa, weapons master of the Seldarine's Hand. Her prowess in archery only bested by her beauty, Kaylessa was devoted to honing the battle skills of any elf under her. If there were any heroes at the Battle of Seldarine's Hand, Kaylessa was one of them. She was a shining example of courage in the face of impending doom as she fearlessly led her people against orc and goblin hordes. Even after the fall of the Hand, her commitment to battle and her people remained strong. Her last wish was to die in glorious battle.
 
 STATISTICS:
@@ -42,7 +74,7 @@ Equipped abilities:
 – Dexterity: +1
 
 THAC0: +3
-Damage: +4
+Damage: +4 (missile)
 Speed Factor: 7
 Proficiency Type: Longbow
 Type: Two-handed
@@ -53,12 +85,13 @@ Weight: 3~
 
 // ie-6007, cam - see also items clbhand, kaybow, lxbowbm, cdxbowbm, storm, flailsk; strings 8663, 8712, 40639, 25818, 27373
 // Weapon damage corrections
+// adding (missile) to damage line
 @8911 = ~Not much is known about the owner of this weapon, save that sages believe it is from another world called "Eibrancha." Plane-traveling wizards who have investigated life on "Eibrancha" report that it is dull, commonplace, and ordinary in the extreme, a place where heroes are rare and the populace is, by and large, incredibly average. This might explain the virtually nonexistent body of recorded information about the place. The only thing known about the weapon's owner is that he was an educated man. The purple wood that the crossbow is constructed from is believed to be from a unique type of tree in Eibrancha.
 
 STATISTICS:
 
 THAC0: +5
-Damage: +3
+Damage: +3 (missile)
 Speed Factor: 4
 Proficiency Type: Crossbow
 Type: Two-handed
@@ -66,6 +99,34 @@ Requires:
  8 Strength
 
 Weight: 7~
+
+// glyph of warding does persist in the EEs, so remove the last sentence of the description about it disappearing if you leave
+@12200 = ~Glyph of Warding
+(Abjuration, Evocation)
+
+Level: 3
+Sphere: Guardian
+Range: Visual range of the caster
+Duration: Special
+Casting Time: 9
+Area of Effect: 12-ft. radius
+Saving Throw: 1/2
+
+A glyph of warding is a powerful inscription, magically drawn to prevent unauthorized or hostile creatures from passing, entering, or opening. It can be used to guard a small bridge, to ward an entry, or as a trap on a chest or box. Any creature violating the warded area sets off the glyph. The glyph deals 1d4 points of electrical damage per level of the caster to the victim(s). A successful Save vs. Spell halves the damage.~
+
+// strike the last sentence about acting as a +1 weapon--it's a spell that just does damage, not a summoned weapon
+@12317 = ~Magical Stone
+(Enchantment)
+
+Level: 1
+Sphere: Combat
+Range: Visual range of the caster
+Duration: Instant
+Casting Time: 4
+Area of Effect: 1 creature
+Saving Throw: None
+
+By using this spell, the priest can temporarily enchant a small pebble, which is then hurled or slung at an opponent. The stone deals 3d4 points of crushing damage to whomever it hits except undead creatures, who take 6d4 points of crushing damage instead.~
 
 // ie-6024, cam - see also string 18095, patches to uhxbw2a.itm and xbow01.itm
 // Two crossbows have the wrong strength requirement
@@ -107,6 +168,69 @@ Requires:
 
 Weight: 6~
 
+// wand of fear's AoE is a 10' radius, not 15'
+@17287 = ~A wand of fear strikes terror into the heart of any creature within its target area. This panic is not universal, however, as the stout of heart have been known to resist its magic. Like all wands, the wand of fear can only be used a limited number of times before it is destroyed.
+
+STATISTICS:
+
+Charge abilities:
+– Fear (Save vs. Spell negates)
+  Range: 100 ft.
+  Duration: 15 rounds
+  Area of Effect: 10-ft. radius
+
+Requires:
+ 9 Intelligence
+
+Weight: 1~
+
+// acid storm lasts for 15 rounds, not 30
+@17621 = ~A trio of wizards worked on this wand using a number of material components they had available to them and more that were relatively easy to acquire. Otterly the Rotund, Mabdek of the Seventh Star, and Yrgon the Moron only crafted the wand so they could sell it. Their long-term goal was the construction of a vast magical research facility based on the designs of the Naturalist Guild in Myth Drannor. Their wand was a greater success than their research facility.
+
+STATISTICS:
+
+Charge abilities:
+– Death Fog
+  Damage: 4 acid in the 1st round, 8 acid in the 2nd round, 16 acid in the 3rd round
+  Special: Movement speed limited to 50% within fog; must save vs. Spell or suffer -2 to Strength and Dexterity that round
+  Range: Visual range of the user
+  Duration: 15 rounds
+  Area of Effect: 12-ft. radius
+
+– Acid Storm
+  Damage: 1d4 acid for 3 rounds, 1d6 acid for the next 3 rounds, and 1d8 acid for the remaining rounds (Save vs. Spell for half)
+  Range: Visual range of the user
+  Duration: 15 rounds
+  Area of Effect: 12-ft. radius
+
+Requires:
+ 9 Intelligence
+
+Weight: 1~
+
+// wand of fire should be using IWD-style Agannazar's Scorcher, not BG2-style
+// see also wand05
+@17654 = ~The wand will cough forth a huge, burning ball of fire that streaks out to the desired range and bursts in a fiery, violent blast, just like the Fireball spell. The fireball inflicts 6d6 points of damage, but all 1s rolled are counted as 2s. The victim(s) may make a Save vs. Wand in order to take only half damage. The second ability of the wand is akin to the spell Agannazar's Scorcher in that a column of flame will streak towards the victim, inflicting 6d6+6 damage with a Save vs. Wand for half.
+
+STATISTICS:
+
+Charge abilities:
+– Fireball
+  Damage: 6d6 fire (Save vs. Wand for half)
+  Range: 60 ft.
+  Area of Effect: 15-ft. radius
+
+– Agannazar's Scorcher
+  Damage (primary target): 3d6 fire (no save)
+  Damage (secondary targets): 2d8 fire (Save vs. Wand for half)
+  Range: 40 ft.
+  Area of Effect: 2-ft. by 40-ft. jet
+
+Requires:
+ 9 Intelligence
+
+Weight: 1~
+
 // ie-6024, cam - see also string 14432, patches to uhxbw2a.itm and xbow01.itm
 // Two crossbows have the wrong strength requirement
 @18095 = ~A crossbow is a bow mounted crosswise on a wooden or metal shaft, the latter called a tiller. The bow is usually made of ash or yew. The crossbow fires a quarrel (also called a bolt).
@@ -128,6 +252,20 @@ Weight: 14~
 // it is incredibly unlikely that these need to be fixed in non-English games
 @20007 = ~Unfff!~ [fthief1l]
 @20011 = ~Uhhh.~ [fthief1m]
+
+// ie-5925, cam
+// cause disease is an abjuration spell, not necromancy
+@21461 = ~Soul Eater
+(Necromancy)
+
+Level: 6
+Range: Visual range of the caster
+Duration: Instant
+Casting Time: 5
+Area of Effect: 7-ft. radius
+Saving Throw: None
+
+This spell deals 3d8 magic damage to all living creatures within a 7-ft. radius. Any creatures that die as a result of this damage are obliterated, and their essence is transformed into a 3-Hit-Dice skeleton under control of the caster. Also, for each creature that dies in this manner, the caster receives a +1 bonus to Strength, Dexterity, and Constitution for 1 turn. Soul Eater has no effect on undead, constructs, and elemental creatures.~
 
 // ie-5925, cam
 // cause disease is an abjuration spell, not necromancy
@@ -154,8 +292,26 @@ If the user fails a save vs. death at -4, they take 8-48 points of fire damage. 
 
 Weight: 1~
 
+// make protection from evil 10' actually be 10'
+@22832 = ~Protection From Evil, 10' Radius
+(Abjuration)
+
+Level: 4
+Sphere: Protection
+Range: Touch
+Duration: 1 turn/level
+Casting Time: 7
+Area of Effect: 10-ft. radius
+Saving Throw: None
+
+When this spell is cast, all creatures within a 10-ft. radius are affected individually by Protection From Evil. Hence, they receive a +2 bonus to Armor Class and Saving Throws against evil-aligned opponents, summoned fiends will not attack them, and they will be immune to all charm-based spells.~
+
+// change reference from innocents (plural) to innocent (singular) (see also dvexing.dlg)
+@24285 = ~I have done as you asked, Vexing Thoughts. The innocents are slain.~
+
 // ie-6007, cam - see also items clbhand, kaybow, lxbowbm, cdxbowbm, storm, flailsk; strings 8663, 8712, 8911, 40639, 27373
 // Weapon damage corrections
+// adding (missile) to damage line
 @25818 = ~This weapon is holy to warriors in the service of Talos, god of storms and destruction, and has seen decades of use in their capable hands. A shortbow made of many composite layers of wood, the Storm Bow has been used against the myriad enemies of the church of Talos. Most recently, the bow was in the possession of a Storm Knight named Kalassan Brevered, who was killed after striking down a number of rangers and druids on the Moonshae Isles.
 
 STATISTICS:
@@ -167,7 +323,7 @@ Charge abilities:
   Area of Effect: The wielder
 
 THAC0: +2
-Damage: +2
+Damage: +2 (missile)
 Speed Factor: 3
 Proficiency Type: Shortbow
 Type: Two-handed
@@ -181,6 +337,24 @@ Weight: 3~
 // it is incredibly unlikely that these need to be fixed in non-English games
 @26213 = ~[A sword has just taken a chunk of his stomach]Ahh!~ [] // sound will be assigned via soundset fixes
 @26214 = ~[Shot through the neck with an arrow]Uggghkk!~ [male3m]
+
+// axe of the minotaur lord: add duration of stun to the 'combat abilities' section, not just the flavor description
+@27035 = ~This fine weapon once belonged to the Minotaur Lord in the Luremaster's catacombs. The axe sports a double blade mounted on a solid oak shaft. It is finely balanced and may be used one-handed. The axe is enchanted, giving the user a +4 to both hit and damage. A successful hit also has a 25% chance of stunning an opponent for 1d4 rounds.
+
+STATISTICS:
+
+Combat abilities:
+– 25% chance target is stunned for 1d4 rounds
+
+THAC0: +4
+Damage: 1d12+4 (slashing)
+Speed Factor: 8
+Proficiency Type: Axe
+Type: One-handed
+Requires:
+ 10 Strength
+
+Weight: 10~
 
 // ie-6007, cam - see also items clbhand, kaybow, lxbowbm, cdxbowbm, storm, flailsk; strings 8663, 8712, 8911, 40639, 25818
 // Weapon damage corrections
@@ -204,6 +378,9 @@ Requires:
 
 Weight: 4~
 
+// name is wrong, he's Crieck (two c's) not Criek - conflicts with 27311
+@27380 = ~Crieck of Bane~
+
 // second sentence in description said "1d2 carrion crawlers", but actually it's a 35/65 split. Changed to a more general "one or two carrion crawlers"
 // same fix required for bg (26586), bg2 (29212), and iwd (35784)
 @35784 = ~Carrion Summons
@@ -218,10 +395,29 @@ Saving Throw: None
 
 There are two parts to this spell. First, a small portal opens and summons one or two carrion crawlers to a point designated by the wizard. Second, the magic mutates the carrion crawlers into larger, more vicious versions of themselves. The wizard now has control over these creature(s) until they are slain or the spell's duration expires. There is a 35% chance that two carrion crawlers will be summoned instead of one.~
 
+// iwdee remove magic is 100% effective, does not use the chance to dispel based on levels
+// most of the flavor text is from dispel magic with a new first sentence and swapping 'remove magic' for 'dispel magic'
+@35872 = ~Remove Magic
+(Abjuration)
+
+Level: 3
+Range: 40 ft.
+Duration: Instant
+Casting Time: 3
+Area of Effect: 15-ft. radius
+Saving Throw: None
+
+This is the combat version of Dispel Magic; it will only affect opponents. Remove Magic removes magical effects upon anyone within the area of effect. This includes magically created items and the effects of spells and potions. It does not, however, affect magical items themselves.~
+
 // sun soulbeam does not roll an attack, just acts as a normal spell--deleted relevant sentence. (see also 37263)
 @36015 = ~Sun Soulbeam
 
 The character emits a dazzling burst of light that strikes at all other creatures within a 15-ft. radius. Struck creatures suffer 9d6 points of fire damage (9d6+3 if undead), unless they save vs. Spell for half. In addition, all creatures except the character must save vs. Spell or be blinded for 2 hours.~
+
+// dragon disciple breath weapon description doesn't mention tha it scales
+// cna just copy bg2ee strref 100381
+@36135 = ~Breath Weapon
+The character breathes a gout of flame up to 30 ft. long, inflicting 3d8 points of fire damage on all creatures caught within the 140-degree cone. The flames deal an additional 1d8 points of fire damage at level 6 and every three levels thereafter, up to a maximum of 8d8 total damage at 18th level.~
 
 /*
 luke
@@ -442,6 +638,67 @@ Special Abilities:
 – Immunity to non-magical weapons
 – Increased movement rate"
 
+// archer's hit/damage bonuses change after level 18
+@37111 = ~ARCHER: The Archer is the epitome of skill with the bow—the ultimate marks<PRO_MANWOMAN>, able to make almost any shot, no matter how difficult. To become so skilled with the bow, the Archer has had to sacrifice some of <PRO_HISHER> proficiency with melee weapons and armor.
+
+Advantages:
+– +1 to hit and damage rolls with any missile weapon every 3 levels through level 18.
+– +1 to hit and damage rolls with any missile weapon every 5 levels from level 23 onwards.
+– May achieve Grand Mastery (5 slots) in longbows, shortbows, and crossbows.
+– May use the Called Shot ability once per day. Gains one use at level 4 and an additional use every 4 levels thereafter.
+
+CALLED SHOT: All successful ranged attacks within the next 10 seconds have the following cumulative effects besides normal damage, according to the level of the Archer:
+ 4th level: -1 penalty to target's THAC0.
+ 8th level: -1 penalty to target's Saving Throws vs. Spell.
+ 12th level: -1 penalty to the target's Strength score.
+ 16th level: +2 bonus to damage roll.
+
+Disadvantages:
+– May only wear leather, studded leather, and hide armor.
+– May only become Proficient (one slot) with melee weapons.
+– May not use the Charm Animal ability.~
+
+// monk AC bonus progression changes at levels 23 and 35
+@37256 = ~MONK: Monks are warriors who pursue perfection through contemplation as well as action. They are versatile fighters, especially skilled in combat without weapons or armor. Though Monks cannot cast spells, they have a unique magic of their own: They channel a subtle energy, called ki, which allows them to perform amazing feats. The Monk's best known feat is their ability to stun an opponent with an unarmed blow.
+
+CLASS FEATURES:
+
+– May not wear any armor.
+– May only use weapons available to the Thief class (except two-handed).
+– May only become Proficient (one slot) in any weapon class.
+– May only become Proficient (one slot) in Single-Weapon Style and may not put slots into any other style.
+– Moves 2 points faster than other characters. Movement rate further improves by 1 every 5 levels.
+– May make 1 unarmed attack per round. An additional 1/2 attack per round is gained every 3 levels. Damage dealt by unarmed attacks increases with level as follows:
+  Level 1-2: 1d6
+  Level 3-5: 1d8
+  Level 6-8: 1d10
+  Level 9-14: 1d12
+  Level 15+: 1d20
+– At level 9, unarmed attacks are treated as a +1 magical weapon and gain a +1 bonus to hit and damage rolls. This enchantment improves to +2 at level 12, +3 at level 15, and +4 at level 25. 
+– Receives a +2 bonus to Saving Throws vs. Spell.
+– Deflect Missiles: +1 bonus to AC vs. missile attacks every 3 levels.
+– Starts with an Armor Class of 9 at 1st level and gains an additional +1 bonus every 2 levels through level 18.
+– Gains an additional +1 AC bonus every 3 levels from level 21 through level 30.
+– Gains an additional +1 AC bonus every 5 levels from level 35 onwards.
+– May use the Stunning Blow ability once per day. Gains one use at level 1 and an additional use every 4 levels thereafter.
+
+STUNNING BLOW: All successful attacks within the next round force the victim to save vs. Spell or be stunned. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 5th level: Becomes immune to all diseases and cannot be slowed or hasted.
+– 7th level: May use the Lay On Hands ability on <PRO_HIMHER>self to heal 2 Hit Points per level.
+– 8th level: Gains a -1 bonus to Speed Factor.
+– 9th level: Gains a +1 bonus to all Saving Throws and becomes immune to charm.
+– 11th level: Becomes immune to poison.
+– 12th level: Gains another -1 bonus to Speed Factor.
+– 13th level: May use the Quivering Palm ability once per day.
+
+QUIVERING PALM: The next successful attack forces the opponent to save vs. Spell or die. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 14th level: Gains 3% Magic Resistance per level (starting with 42% at 14th level).
+– 20th level: Becomes immune to non-magical weapons.
+– Alignment restricted to lawful.
+– Hit Die: d8~
+
 // sun soulbeam does not roll an attack, just acts as a normal spell--deleted relevant sentence. (see also 36015)
 @37263 = ~SUN SOUL MONK: Sun Soul Monks were once worshippers of Amaunator in the time of the Netheril, but today their worship is divided between Lathander, Selûne, and Sune. Sun Soul Monks adhere strictly to the law, using their martial arts and magical abilities to drive out darkness and corruption wherever they find it.
 
@@ -659,6 +916,7 @@ The Druid is healed 12 Hit Points after using this ability.~
 
 // ie-6007, cam - see also items clbhand, kaybow, lxbowbm, cdxbowbm, storm, flailsk; strings 8663, 8712, 8911, 25818, 27373
 // Weapon damage corrections
+// adding (missile) to damage line
 @40639 = ~Not much is known about the owner of this weapon, save that sages believe it is from another world called "Eibrancha." Plane-traveling wizards who have investigated life on "Eibrancha" report that it is dull, commonplace, and ordinary in the extreme, a place where heroes are rare and the populace is, by and large, incredibly average. This might explain the virtually nonexistent body of recorded information about the place. The only thing known about the weapon's owner is that he was an educated man. The purple wood that the crossbow is constructed from is believed to be from a unique type of tree in Eibrancha.
 
 After contacting another plane and learning about Bren Muller, you have learned a new ability of the weapon. Once per day, it can dramatically increase accuracy for two rounds.
@@ -670,7 +928,7 @@ Charge abilities:
   Wielder gains an additional +5 to-hit for two rounds
 
 THAC0: +5
-Damage: +3
+Damage: +3 (missile)
 Speed Factor: 4
 Proficiency Type: Crossbow
 Type: Two-handed

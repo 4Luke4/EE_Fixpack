@@ -21,6 +21,44 @@ COPY_EXISTING ~ghoul1.itm~   ~override~ // Ghoul Touch - causes hold - plays sou
   LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 324 parameter1 = hold_immunity parameter2 = 110 STR_VAR insert = first resource = EVAL ~%SOURCE_RES%~ END
 */
 
+// the new 328s are being set above the self-324s on some spells
+COPY_EXISTING ~sppr422.spl~ ~override~ // blood rage
+  LPF CLONE_EFFECT INT_VAR match_opcode = 324 opcode = 500 STR_VAR insert = first END // laaaaaaaaaaaaaaaaaaaaaaaazy
+  LPF DELETE_EFFECT INT_VAR match_opcode = 324 END
+  LPF ALTER_EFFECT INT_VAR match_opcode = 500 opcode = 324 END
+
+// the new 324 is above the self-318 for minor globe and shouldn't be
+COPY_EXISTING ~sppr423.spl~ ~override~ // cloud of pestilence
+              ~sppr426.spl~ ~override~ // smashing wave
+  LPF CLONE_EFFECT INT_VAR match_opcode = 318 opcode = 500 STR_VAR insert = first END // laaaaaaaaaaaaaaaaaaaaaaaazy
+  LPF DELETE_EFFECT INT_VAR match_opcode = 318 END
+  LPF ALTER_EFFECT INT_VAR match_opcode = 500 opcode = 318 END
+
+
+// many items/spells that block stun miss whirlwind's 'stunned' string
+COPY_EXISTING ~behamu.itm~   ~override~ // no such index
+              ~cibossb.itm~  ~override~ // ring
+              ~cigbard.itm~  ~override~ // ring of free action
+              ~freeact.itm~  ~override~ // ring of free action
+              ~invulner.itm~ ~override~ // ring
+              ~ipsion.itm~   ~override~ // greenstone amulet
+              ~labelt.itm~   ~override~ // girdle of labelas
+              ~minhp1.itm~   ~override~ // no such index
+              ~plyjelly.itm~ ~override~ // attack
+              ~ring09.itm~   ~override~ // ring of free action
+              ~ring90.itm~   ~override~ // ring
+              ~ring91.itm~   ~override~ // ring
+              ~stalker.itm~  ~override~ // ring
+              ~trollall.itm~ ~override~ // attack
+              ~trollimm.itm~ ~override~ // ring
+              ~spcl152.spl~  ~override~ // rage
+              ~spcl321.spl~  ~override~ // enrage
+              ~spcl542a.spl~ ~override~ // no such index
+              ~spcl920a.spl~ ~override~ // no such index
+              ~sppr403.spl~  ~override~ // free action
+              ~sppr422.spl~  ~override~ // blood rage
+  LPF CLONE_EFFECT INT_VAR match_opcode = 101 match_parameter2 = 45 opcode = 267 parameter1 = 35568 parameter2 = 0 END 
+
 // poison immunity blocking slow
 COPY_EXISTING ~jellmu1.itm~  ~override~ // (spl) <Invalid Strref -1> - causes hold poison - portrait icon(s) 6 13
   LPF CLONE_EFFECT  INT_VAR match_opcode = 318 STR_VAR insert = last END
@@ -52,6 +90,10 @@ COPY_EXISTING ~spin120.spl~  ~override~ // (spl) Retribution - causes sleep - ad
               ~spin161.spl~  ~override~ // (spl) <Invalid Strref -1> - causes sleep - additional effects [remove stacking protection]
   LPF CLONE_EFFECT INT_VAR match_opcode = 39 opcode = 324 parameter1 = sleep_immunity parameter2 = 110 timing = 0 resist_dispel = 0 duration = 0 STR_VAR insert = first resource = EVAL ~%SOURCE_RES%~ END
 
+// stun immunity check missing
+COPY_EXISTING ~sppr617b.spl~ ~override~ // (spl) whirlwind stun  
+  LPF CLONE_EFFECT INT_VAR match_opcode = 45 opcode = 324 parameter1 = stun_immunity parameter2 = 110 timing = 0 resist_dispel = 0 duration = 0 STR_VAR insert = first resource = EVAL ~%SOURCE_RES%~ END
+
 // stun immunity check placed too late
 COPY_EXISTING ~sppr716.spl~  ~override~ // (spl) Symbol, Hopelessness - causes stun - portrait icon(s) 44 - sound(s) #eff_e04 [expiry sound, hopelesssness icon]
               ~spwi411.spl~  ~override~ // (spl) Emotion, Hopelessness - causes stun - portrait icon(s) 44 - sound(s) #eff_e05 [expiry sound, hopelesssness icon]
@@ -66,18 +108,17 @@ COPY_EXISTING ~sppr716.spl~  ~override~ // (spl) Symbol, Hopelessness - causes s
 // luke's seven eyes fix already creates subspells, but renaming subspells for bg/bg2 consistency
 COPY_EXISTING ~ghast1.itm~ ~override~
   LPF ALTER_EFFECT INT_VAR match_opcode = 146 savingthrow = BIT1 STR_VAR match_resource = ghast1 resource = ghast1n END
-  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = ghast2 resource = ghast1p END
 
 // luke's seven eyes fix already creates subspells, but renaming subspells for bg/bg2 consistency
 COPY ~override/ghast1.spl~ ~override/ghast1n.spl~ // nausea subspell
   LPF ALTER_EFFECT INT_VAR savingthrow = 0 END
-MOVE ~override/ghast2.spl~ ~override/ghast1p.spl~ // paralyze subspell
+//MOVE ~override/ghast2.spl~ ~override/ghast1p.spl~ // paralyze subspell
 
 // luke's seven eyes already split this, but it needs a unique resref
-COPY_EXISTING ~icetrl.itm~   ~override~ // Attack - causes stun - unknown long effect - unknown long effect
-  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = icetrl resource = icetrlst END
+//COPY_EXISTING ~icetrl.itm~   ~override~ // Attack - causes stun - unknown long effect - unknown long effect
+//  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = icetrl resource = icetrlst END
 
-MOVE ~override/icetrl.spl~ ~override/icetrlst.spl~
+//MOVE ~override/icetrl.spl~ ~override/icetrlst.spl~
 COPY_EXISTING ~icetrlst.spl~ ~override~
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 324 parameter1 = stun_immunity parameter2 = 110 STR_VAR resource = EVAL ~%DEST_RES%~ END
   
@@ -98,24 +139,24 @@ COPY ~eefixpack/files/spl/cdcure.spl~ ~override/sflailst.spl~
   LPF ADD_SPELL_EFFECT INT_VAR opcode = 139 target = 2 parameter1 = 35568 timing = 1 END // stunned string
 
 // split out confusion from main insanity gaze spell
-MOVE ~override/insanit2.spl~ ~override/insanitc.spl~
+//MOVE ~override/insanit2.spl~ ~override/insanitc.spl~
 COPY_EXISTING ~insanitc.spl~ ~override~ // (spl) Insanity Gaze - causes confusion feeblemind - portrait icon(s) 47 48 - sound(s) #eff_e05 - additional effects
   LPF CLONE_EFFECT INT_VAR match_opcode = 128 opcode = 324 parameter1 = confusion_immunity parameter2 = 110 timing = 0 resist_dispel = 0 duration = 0 STR_VAR insert = first resource = EVAL ~%SOURCE_RES%~ END
-MOVE ~override/insanit1.spl~ ~override/insanitf.spl~
+//MOVE ~override/insanit1.spl~ ~override/insanitf.spl~
 COPY_EXISTING ~insanitf.spl~ ~override~ // (spl) Insanity Gaze - causes confusion feeblemind - portrait icon(s) 47 48 - sound(s) #eff_e05 - additional effects
   LPF CLONE_EFFECT INT_VAR match_opcode = 76 opcode = 324 parameter1 = feeblemind_immunity parameter2 = 110 timing = 0 resist_dispel = 0 duration = 0 STR_VAR insert = first resource = EVAL ~%SOURCE_RES%~ END
 
 // luke's seven eyes fix already creates subspells, but renaming subspells for bg/bg2 consistency
-COPY_EXISTING ~insanity.spl~ ~override~ // (spl) Insanity Gaze - causes confusion feeblemind - portrait icon(s) 47 48 - sound(s) #eff_e05 - additional effects
-  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = insanit1 resource = insanitf END
-  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = insanit2 resource = insanitc END
+//COPY_EXISTING ~insanity.spl~ ~override~ // (spl) Insanity Gaze - causes confusion feeblemind - portrait icon(s) 47 48 - sound(s) #eff_e05 - additional effects
+//  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = insanit1 resource = insanitf END
+//  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = insanit2 resource = insanitc END
   
 // luke's seven eyes fix already creates subspells, but renaming subspells for bg/bg2 consistency
-MOVE ~override/spcl415b.spl~ ~override/spcl415h.spl~
+//MOVE ~override/spcl415b.spl~ ~override/spcl415h.spl~
 COPY ~eefixpack/files/spl/spcl415h.spl~ ~override~ // just the hold ability farmed out into separate spell
   LPF ALTER_EFFECT INT_VAR match_opcode = 324 parameter1 = hold_immunity END
-COPY_EXISTING ~spcl415.spl~ ~override~
-  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = spcl415b resource = spcl415h END
+//COPY_EXISTING ~spcl415.spl~ ~override~
+//  LPF ALTER_EFFECT INT_VAR match_opcode = 146 STR_VAR match_resource = spcl415b resource = spcl415h END
 
 // chromatic orb - subspells for hold (7), blind (1,4), and stun (6)
 COPY_EXISTING ~spdr101.spl~  ~override~ // Chromatic Orb (druid)
@@ -163,13 +204,16 @@ COPY_EXISTING ~spwi028.spl~  ~override/spwi028h.spl~ // (spl) <Invalid Strref -1
   LPF DELETE_EFFECT INT_VAR match_savingthrow = BIT2 END // delete poison
   LPF DELETE_EFFECT INT_VAR match_opcode = 318 END // poison protections
   LPF DELETE_EFFECT INT_VAR match_opcode = 12 END // delete damage
+  LPF DELETE_EFFECT INT_VAR match_opcode = 146 END // delete cast of spwi028a
   LPM cd_make_subspell
 
 // poison immunity blocking hold, needs hold subspell
 COPY_EXISTING ~spwi028.spl~  ~override~ // (spl) <Invalid Strref -1> - causes hold poison - portrait icon(s) 6 13
-  LPF CLONE_EFFECT  INT_VAR match_opcode = 175 opcode = 146 parameter2 = 2 timing = 1 duration = 0 savingthrow = 17 STR_VAR resource = spwi028h insert = first END // change hold to cast spell
+  LPF CLONE_EFFECT  INT_VAR match_opcode = 175 opcode = 146 parameter2 = 2 timing = 1 duration = 0 savingthrow = 17 STR_VAR resource = spwi028h insert = last END // change hold to cast spell
   LPF DELETE_EFFECT INT_VAR match_savingthrow = BIT0 END // delete other hold effects
   LPF ALTER_EFFECT  INT_VAR match_opcode = 146 match_savingthrow = 17 savingthrow = BIT0 END // reinstate savingthrow
+  LPF ALTER_EFFECT INT_VAR match_opcode = 318 STR_VAR resource = spwi028b END 
+  LPF ALTER_EFFECT INT_VAR match_opcode = 324 STR_VAR resource = spwi028h END 
 
 // poison immunity stepping on confusion, move confusion to subspell
 COPY_EXISTING ~spwi029.spl~ ~override/spwi029c.spl~ // (spl) <Invalid Strref -1> - causes confusion poison - portrait icon(s) 6 3
@@ -356,7 +400,7 @@ COPY_EXISTING ~bpdispel.spl~ ~override~ // <Invalid Strref -1> - cures berserk b
 // create resource removal spell
 COPY ~eefixpack/files/spl/cdcure.spl~ ~override/#curedef.spl~
   LPF ADD_SPELL_EFFECT INT_VAR opcode =  81 target = 2 timing = 1                  END // cure: deafness
-  LPF ADD_SPELL_EFFECT INT_VAR opcode = 240 target = 2 timing = 1 parameter2 = 122 END // remove icon: deafness
+  LPF ADD_SPELL_EFFECT INT_VAR opcode = 240 target = 2 timing = 1 parameter2 = 112 END // remove icon: deafness
 /*
   PATCH_FOR_EACH res IN
 //    ~dwfpgs01~ // (spl) <Invalid Strref -1> - causes deafness stun

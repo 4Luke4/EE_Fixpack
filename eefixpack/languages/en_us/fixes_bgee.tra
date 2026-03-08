@@ -4,6 +4,158 @@
 
 // any strings >= 34000 are sod strings and should go into the fixes_bgee_sod.tra file instead. 
 
+/*
+jazira
+It should be "Shandalar", not "Shandelar".
+*/
+@4783  = ~[HELSHARA 2] Only a fool would goad a daughter of Shandalar so!~ [HELSH02]
+
+/*
+jazira
+The audio file associated should be "[SURGN03]", not "[STORE05]".
+*/
+@12433 = ~[THE SURGEON 3]~ [SURGN03]
+
+/*
+jazira
+The audio file associated should be "[SURGN04]", not "[STORE06]".
+*/
+@12434 = ~[THE SURGEON 4]~ [SURGN04]
+
+// copy-paste strref 17872 from bg2ee for this (missing move silently line)
+@17872 = ~This potion heightens the sensory perception of the drinker, which allows delicate tasks to be performed better. The effect is to make certain thieving skills more likely to succeed.
+
+STATISTICS:
+
+Find Traps: +20%
+Pick Pockets: +20%
+Open Locks: +20%
+Move Silently: +20%
+Hide In Shadows: +20%
+Duration: 6 hours
+
+Weight: 1~
+
+// monk AC bonus progression changes at levels 23 and 35
+@24234 = ~MONK: Monks are warriors who pursue perfection through contemplation as well as action. They are versatile fighters, especially skilled in combat without weapons or armor. Though Monks cannot cast spells, they have a unique magic of their own: They channel a subtle energy, called ki, which allows them to perform amazing feats. The Monk's best known feat is their ability to stun an opponent with an unarmed blow.
+
+CLASS FEATURES:
+
+– May not wear any armor.
+– May only use weapons available to the Thief class (except two-handed).
+– May only become Proficient (one slot) in any weapon class.
+– May only become Proficient (one slot) in Single-Weapon Style and may not put slots into any other style.
+– Moves 2 points faster than other characters. Movement rate further improves by 1 every 5 levels.
+– May make 1 unarmed attack per round. An additional 1/2 attack per round is gained every 3 levels. Damage dealt by unarmed attacks increases with level as follows:
+  Level 1-2: 1d6
+  Level 3-5: 1d8
+  Level 6-8: 1d10
+  Level 9-14: 1d12
+  Level 15+: 1d20
+– At level 9, unarmed attacks are treated as a +1 magical weapon and gain a +1 bonus to hit and damage rolls. This enchantment improves to +2 at level 12, +3 at level 15, and +4 at level 25. 
+– Receives a +2 bonus to Saving Throws vs. Spell.
+– Deflect Missiles: +1 bonus to AC vs. missile attacks every 3 levels.
+– Starts with an Armor Class of 9 at 1st level and gains an additional +1 bonus every 2 levels through level 18.
+– Gains an additional +1 AC bonus every 3 levels from level 21 through level 30.
+– Gains an additional +1 AC bonus every 5 levels from level 35 onwards.
+– May use the Stunning Blow ability once per day. Gains one use at level 1 and an additional use every 4 levels thereafter.
+
+STUNNING BLOW: All successful attacks within the next round force the victim to save vs. Spell or be stunned. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 5th level: Becomes immune to all diseases and cannot be slowed or hasted.
+– 7th level: May use the Lay On Hands ability on <PRO_HIMHER>self to heal 2 Hit Points per level.
+– 8th level: Gains a -1 bonus to Speed Factor.
+– 9th level: Gains a +1 bonus to all Saving Throws and becomes immune to charm.
+– 11th level: Becomes immune to poison.
+– 12th level: Gains another -1 bonus to Speed Factor.
+– 13th level: May use the Quivering Palm ability once per day.
+
+QUIVERING PALM: The next successful attack forces the opponent to save vs. Spell or die. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 14th level: Gains 3% Magic Resistance per level (starting with 42% at 14th level).
+– 20th level: Becomes immune to non-magical weapons.
+– Alignment restricted to lawful.
+– Hit Die: d8~
+
+// archer's hit/damage bonuses change after level 18
+@24298 = ~ARCHER: The Archer is the epitome of skill with the bow—the ultimate marks<PRO_MANWOMAN>, able to make almost any shot, no matter how difficult. To become so skilled with the bow, the Archer has had to sacrifice some of <PRO_HISHER> proficiency with melee weapons and armor.
+
+Advantages:
+– +1 to hit and damage rolls with any missile weapon every 3 levels through level 18.
+– +1 to hit and damage rolls with any missile weapon every 5 levels from level 23 onwards.
+– May achieve Grand Mastery (5 slots) in longbows, shortbows, and crossbows.
+– May use the Called Shot ability once per day. Gains one use at level 4 and an additional use every 4 levels thereafter.
+
+CALLED SHOT: All successful ranged attacks within the next 10 seconds have the following cumulative effects besides normal damage, according to the level of the Archer:
+ 4th level: -1 penalty to target's THAC0.
+ 8th level: -1 penalty to target's Saving Throws vs. Spell.
+ 12th level: -1 penalty to the target's Strength score.
+ 16th level: +2 bonus to damage roll.
+
+Disadvantages:
+– May only wear leather, studded leather, and hide armor.
+– May only become Proficient (one slot) with melee weapons.
+– May not use the Charm Animal ability.~
+
+// radius is actually 10'
+@25825 = ~Protection From Evil, 10' Radius
+(Abjuration)
+
+Level: 4
+Sphere: Protection
+Range: Touch
+Duration: 1 turn/level
+Casting Time: 7
+Area of Effect: 10-ft. radius
+Saving Throw: None
+
+When this spell is cast, all allied creatures within a 10-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
+
+// strike the last sentence about acting as a +1 weapon--it's a spell that just does damage, not a summoned weapon
+@26130 = ~Magical Stone
+(Enchantment)
+
+Level: 1
+Sphere: Combat 
+Range: 50 ft.
+Duration: Instant
+Casting Time: 4 
+Area of Effect: 1 creature
+Saving Throw: None 
+
+By using this spell, the priest can create a small magical pebble, which then flies out and hits a target opponent. The stone deals 1d4 points of damage to whomever it hits.~
+
+
+// shield of the archons cannot be dispelled, but it also doesn't absorb dispel - just use strref 15965 from iwdee
+@26287 = ~Shield of the Archons
+(Abjuration)
+
+Level: 7
+Sphere: Protection
+Range: Touch
+Duration: 3 rounds/level
+Casting Time: 9
+Area of Effect: The caster
+Saving Throw: None
+
+This powerful abjuration spell causes the spells cast against the priest to be absorbed and consumed. This affects a total number of spell levels equal to half the level of the caster. It includes spells cast from scrolls and innate spell-like abilities, but excludes area effects that are not centered directly upon the priest and area effects that are stationary, such as Cloudkill and Stinking Cloud.
+
+As long as there are levels remaining, the spell will be absorbed. For example, if there is only 1 level left and a 3rd-level spell is cast at the priest, the spell will be absorbed while canceling the shield.
+
+This spell will not protect the caster from Dispel Magic, but it will not be dispelled by Dispel Magic either.~
+
+// cone of cold's AoE is 18 ft long, not 17
+@26493 = ~Cone of Cold
+(Evocation)
+
+Level: 5
+Range: 0
+Duration: Instant
+Casting Time: 5
+Area of Effect: 18-ft. cone with 90-deg. arc
+Saving Throw: 1/2
+
+When this spell is cast, it generates a cone-shaped area of extreme cold originating at the wizard's hand and extending outward in a cone 18 ft. long with a 90-deg. arc. It drains heat and causes 1d4+1 points of damage per level of the caster. For example, a 10th-level wizard would cast a cone of cold causing 10d4+10 points of damage.~
 
 // second sentence in description said "1d2 carrion crawlers", but actually it's a 35/65 split. Changed to a more general "one or two carrion crawlers"
 // same fix required for bg (26586), bg2 (29212), and iwd (35784)
@@ -18,6 +170,34 @@ Area of Effect: Special
 Saving Throw: None
 
 There are two parts to this spell. First, a small portal opens and summons one or two carrion crawlers to a point designated by the wizard. Second, the magic mutates the carrion crawlers into larger, more vicious versions of themselves. The wizard now has control over these creature(s) until they are slain or the spell's duration expires. There is a 35% chance that two carrion crawlers will be summoned instead of one.~
+
+// using iwdee's summon nishruu; see @35786 in your local copy_from_iwdee.tra
+@26588 = ~Summon Nishruu
+(Conjuration/Summoning)
+
+Level: 6
+Range: 25 ft.
+Duration: 1 round/level
+Casting Time: 9
+Area of Effect: Special
+Saving Throw: None
+
+By casting Summon Nishruu, a wizard calls into existence a magical being of considerable power: the nishruu. At first glance, this appears to be some sort of mist, but upon closer examination, this boiling, churning gray mass of vapors and shapes moves with a life of its own. Drawn toward magic like a moth to the flame, the nishruu feeds on the energies surrounding and used by wizards. Luckily, there is no question as to the loyalty of the creature, and it will not attack its summoner even though it would like nothing better.
+
+The nishruu has no physical attacks at all, although physical attacks can hurt it. Each time a nishruu touches a target wizard and wraps its tendrils around <PRO_HIMHER>, two things happen: First, all magical items with charges in the possession of the target will be drained by 1 charge, destroying them if only 1 charge was left; second, the wizard loses 1 random spell of the highest level currently memorized. The nishruu is completely immune to energy damage, and magic will actually heal it. The creature will remain under the wizard's control until slain or until the spell's duration expires.~
+
+// remove the line about the save penalty for water/plants since it's not implemented
+@26646 = ~Abi-Dalzim's Horrid Wilting
+(Necromancy) 
+
+Level: 8
+Range: Visual range of the caster 
+Duration: Instant
+Casting Time: 8
+Area of Effect: 15-ft. radius
+Saving Throw: 1/2
+
+This spell evaporates moisture from the bodies of every living creature within the area of effect, inflicting 1d8 damage per level of the caster. Affected creatures are allowed a Saving Throw vs. Spell for half damage. This spell will not harm party members.~
 
 // sun soulbeam does not roll an attack, just acts as a normal spell--deleted relevant sentence. (see also 32224)
 @31984 = ~SUN SOUL MONK: Sun Soul Monks were once worshippers of Amaunator in the time of the Netheril, but today their worship is divided between Lathander, Selûne, and Sune. Sun Soul Monks adhere strictly to the law, using their martial arts and magical abilities to drive out darkness and corruption wherever they find it.

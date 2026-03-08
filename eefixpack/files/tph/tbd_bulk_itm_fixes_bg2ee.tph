@@ -4,7 +4,21 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_bulk_changes_itm BEGIN
   //file, timing, magical, power, speed, weight, thac0, lore, type, prof, enchantment, dispellable, range => file // notes
   aegis, null, null, null, null, null, null, null, null, null, 3, null, null => aegis // tbd, cam: aegis fang has wrong enchantment level
   aegis2, null, null, null, null, null, null, null, null, null, 3, null, null => aegis2 // tbd, cam: aegis fang has wrong enchantment level
+  blun22, null, null, null, 1, null, null, null, null, null, null, null, null => blun22 // speed factor not accounting for enchantment
+  blun23, null, null, null, 2, null, null, null, null, null, null, null, null => blun23 // speed factor not accounting for enchantment
+  blun24, null, null, null, 2, null, null, null, null, null, null, null, null => blun24 // speed factor not accounting for enchantment
+  blun26, null, null, null, 1, null, null, null, null, null, null, null, null => blun26 // speed factor not accounting for enchantment
+  blun27, null, null, null, 0, null, null, null, null, null, null, null, null => blun27 // speed factor not accounting for enchantment
   critical, null, null, null, null, null, null, null, null, null, null, null, 0 => critical // luke: cause wounds spells should be 0 range (from files/tph/luke/cause_wounds.tph)
+  dagg24, null, null, null, null, 1, null, null, null, null, null, null, null => dagg24 // rp: dagger+3 should have some weight
+  elemchan, null, null, null, null, null, null, null, null, null, 4, null, null => elemchan // upping enchantment for elemental princes
+  elemcryo, null, null, null, null, null, null, null, null, null, 4, null, null => elemcryo // upping enchantment for elemental princes
+  elemhydr, null, null, null, null, null, null, null, null, null, 4, null, null => elemhydr // upping enchantment for elemental princes
+  elemimix, null, null, null, null, null, null, null, null, null, 4, null, null => elemimix // upping enchantment for elemental princes
+  elemogre, null, null, null, null, null, null, null, null, null, 4, null, null => elemogre // upping enchantment for elemental princes
+  elemsunn, null, null, null, null, null, null, null, null, null, 4, null, null => elemsunn // upping enchantment for elemental princes
+  elemyanc, null, null, null, null, null, null, null, null, null, 4, null, null => elemyanc // upping enchantment for elemental princes
+  elemzaam, null, null, null, null, null, null, null, null, null, 4, null, null => elemzaam // upping enchantment for elemental princes
   eneblade, null, null, 0, null, null, null, null, null, null, null, null, null => eneblade // luke: Energy Blade – should not interact with spell protections
   fblade, null, null, 0, null, null, null, null, null, null, null, null, null => fblade // luke: flame blade should not interact with level-based spell protections
   fireseed, null, null, 0, null, null, null, null, null, null, null, null, null => fireseed // luke: Fire Seed should not interact with level-based spell protections
@@ -12,8 +26,13 @@ ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_bulk_changes_itm BEGIN
   ghoult, null, null, 0, null, null, null, null, null, null, null, null, null => ghoult // luke: Ghoul Touch – should not interact with spell protections
   harm, null, null, null, null, null, null, null, null, null, null, null, 0 => harm // luke: cause wounds spells should be 0 range (from files/tph/luke/cause_wounds.tph)
   melfmet, null, null, 0, null, null, null, null, null, null, null, null, null => melfmet // luke: Melf's Minute Meteors – should not interact with spell protections
+  misc4q, null, null, null, null, null, null, null, null, 89, null, null, null => misc4q // ogre’s sword is a bastard sword, not long sword
   serious, null, null, null, null, null, null, null, null, null, null, null, 0 => serious // luke: cause wounds spells should be 0 range (from files/tph/luke/cause_wounds.tph)
   slaylive, null, null, null, null, null, null, null, null, null, null, null, 0 => slaylive // luke: cause wounds spells should be 0 range (from files/tph/luke/cause_wounds.tph)
+  staf09, null, null, null, 2, null, null, null, null, null, null, null, null => staf09 // rp: WS fix for staff of command
+  staf12, null, null, null, 2, null, null, null, null, null, null, null, null => staf12 // rp: WS fix for staff of power
+  sw1h28, null, null, null, 0, null, null, null, null, null, null, null, null => sw1h28 // rp: cutthroat should have 0 WS as a +4 SS
+  sw2h14, null, null, null, 7, null, null, null, null, null, null, null, null => sw2h14 // rp: lilarcor should have ws 7 as a +3 2HS
 
 END
 

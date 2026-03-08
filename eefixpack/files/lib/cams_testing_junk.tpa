@@ -336,3 +336,624 @@ COPY_EXISTING_REGEXP GLOB ~^.+\cre$~ ~override~
     END
   END
   BUT_ONLY
+  
+  
+  
+  
+  
+  
+  
+  
+// used to sort Parys' pile of new item BAMs into folders, removing redundancies
+// the last bit only works if run in a bgee directory without SoD
+<<<<<<<<./inline/blank.txt
+>>>>>>>>
+
+COPY ~./inline/blank.txt~ ~eefixpack/newbam.txt~
+
+OUTER_SET bgee  = 1  
+ACTION_BASH_FOR ~eefixpack/newbams/bgee~ ~.+\.bam~ BEGIN 
+
+  OUTER_SET bg2ee = 0
+  OUTER_SET iwdee = 0
+  ACTION_IF FILE_EXISTS ~eefixpack/newbams/bg2ee/%BASH_FOR_FILE%~ BEGIN OUTER_SET bg2ee = 1 END
+  ACTION_IF FILE_EXISTS ~eefixpack/newbams/iwdee/%BASH_FOR_FILE%~ BEGIN OUTER_SET iwdee = 1 END
+  ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_new_bams BEGIN ~%BASH_FOR_RES%~, ~%bgee%~, ~%bg2ee%~, ~%iwdee%~ => ~%BASH_FOR_RES%~ END
+
+END 
+
+OUTER_SET bgee  = 0  
+OUTER_SET bg2ee = 1
+ACTION_BASH_FOR ~eefixpack/newbams/bg2ee~ ~.+\.bam~ BEGIN 
+
+  ACTION_IF !FILE_EXISTS ~eefixpack/newbams/bgee/%BASH_FOR_FILE%~ BEGIN 
+    OUTER_SET iwdee = 0
+    ACTION_IF FILE_EXISTS ~eefixpack/newbams/iwdee/%BASH_FOR_FILE%~ BEGIN OUTER_SET iwdee = 1 END
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_new_bams BEGIN ~%BASH_FOR_RES%~, ~%bgee%~, ~%bg2ee%~, ~%iwdee%~ => ~%BASH_FOR_RES%~ END
+  END
+  
+END 
+
+OUTER_SET bgee  = 0 
+OUTER_SET bg2ee = 0 
+OUTER_SET iwdee = 1
+ACTION_BASH_FOR ~eefixpack/newbams/bg2ee~ ~.+\.bam~ BEGIN 
+
+  ACTION_IF !FILE_EXISTS ~eefixpack/newbams/bgee/%BASH_FOR_FILE%~ AND 
+            !FILE_EXISTS ~eefixpack/newbams/bg2ee/%BASH_FOR_FILE%~ BEGIN  
+    ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_new_bams BEGIN ~%BASH_FOR_RES%~, ~%bgee%~, ~%bg2ee%~, ~%iwdee%~ => ~%BASH_FOR_RES%~ END
+  END  
+
+END 
+
+ACTION_PHP_EACH cd_new_bams AS pm => file BEGIN
+
+  OUTER_SPRINT report ~%file%.bam:%WNL%~
+  
+  ACTION_IF pm_1 BEGIN // has a BGEE bam
+    COPY - ~eefixpack/newbams/bgee/%file%.bam~ ~eefixpack/newbams/bgee/%file%.bam~ 
+      SET bg_size = SOURCE_SIZE
+      READ_ASCII 0x00 bg_contents (SOURCE_SIZE)
+  END   
+
+  ACTION_IF pm_2 BEGIN // has a BGEE bam
+    COPY - ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/newbams/bg2ee/%file%.bam~ 
+      SET bg2_size = SOURCE_SIZE
+      READ_ASCII 0x00 bg2_contents (SOURCE_SIZE)
+  END    
+
+  ACTION_IF pm_3 BEGIN // has a BGEE bam
+    COPY - ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/newbams/iwdee/%file%.bam~ 
+      SET iwd_size = SOURCE_SIZE
+      READ_ASCII 0x00 iwd_contents (SOURCE_SIZE)
+  END   
+
+  OUTER_SET bgee_bg2ee  = 0
+  OUTER_SET bgee_iwdee  = 0
+  OUTER_SET bg2ee_iwdee = 0
+  
+  ACTION_IF pm_1 AND pm_2 BEGIN 
+    ACTION_IF (bg_size = bg2_size) AND 
+              ("%bg_contents%" STRING_COMPARE_CASE "%bg2_contents%" = 0) BEGIN
+      OUTER_SET bgee_bg2ee  = 1
+    END
+  END     
+  
+  ACTION_IF pm_1 AND pm_3 BEGIN 
+    ACTION_IF (bg_size = iwd_size) AND 
+              ("%bg_contents%" STRING_COMPARE_CASE "%iwd_contents%" = 0) BEGIN
+      OUTER_SET bgee_iwdee  = 1
+    END
+  END       
+  
+  ACTION_IF pm_2 AND pm_3 BEGIN 
+    ACTION_IF (bg2_size = iwd_size) AND 
+              ("%bg2_contents%" STRING_COMPARE_CASE "%iwd_contents%" = 0) BEGIN
+      OUTER_SET bg2ee_iwdee  = 1
+    END
+  END     
+  
+  ACTION_IF pm_1 AND pm_2 AND pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - present for all games%WNL%~
+    ACTION_IF bgee_bg2ee AND bgee_iwdee BEGIN 
+      OUTER_SPRINT report ~%report% - identical in all games~
+      COPY ~eefixpack/newbams/bgee/%file%.bam~ ~eefixpack/sorted_bams/universal/%file%.bam~
+    END ELSE BEGIN  
+      ACTION_IF !bgee_bg2ee AND !bgee_iwdee AND !bg2ee_iwdee BEGIN 
+        OUTER_SPRINT report ~%report% - different in all games~
+        COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee/%file%.bam~
+        COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee/%file%.bam~
+        COPY ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/sorted_bams/iwdee/%file%.bam~
+      END ELSE  
+      ACTION_IF bgee_bg2ee BEGIN 
+        OUTER_SPRINT report ~%report% - BG, BG2 version match; IWD version different~
+        COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee_bg2ee/%file%.bam~
+        COPY ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/sorted_bams/iwdee/%file%.bam~
+      END ELSE   
+      ACTION_IF bgee_iwdee BEGIN 
+        OUTER_SPRINT report ~%report% - BG, IWD version match; BG2 version different~
+        COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee_iwdee/%file%.bam~
+        COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee/%file%.bam~
+      END ELSE BEGIN 
+        OUTER_SPRINT report ~%report% - BG2, IWD version match; BG version different~  
+        COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee/%file%.bam~
+        COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee_iwdee/%file%.bam~
+      END
+    END
+  END
+
+  ACTION_IF pm_1 AND pm_2 AND !pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - present for BG, BG2%WNL%~
+    ACTION_IF bgee_bg2ee BEGIN 
+      OUTER_SPRINT report ~%report% - identical in all games~
+        COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee_bg2ee/%file%.bam~
+    END ELSE BEGIN   
+      OUTER_SPRINT report ~%report% - do not match~
+      COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee/%file%.bam~
+      COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee/%file%.bam~
+    END
+  END     
+
+  ACTION_IF pm_1 AND !pm_2 AND pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - present for BG, IWD%WNL%~
+    ACTION_IF bgee_iwdee BEGIN 
+      OUTER_SPRINT report ~%report% - identical in all games~
+      COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee_iwdee/%file%.bam~
+    END ELSE BEGIN   
+      OUTER_SPRINT report ~%report% - do not match~
+      COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee/%file%.bam~
+      COPY ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/sorted_bams/iwdee/%file%.bam~
+    END
+  END        
+
+  ACTION_IF !pm_1 AND pm_2 AND pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - present for BG2, IWD%WNL%~
+    ACTION_IF bg2ee_iwdee BEGIN 
+      OUTER_SPRINT report ~%report% - identical in all games~
+      COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee_iwdee/%file%.bam~
+    END ELSE BEGIN   
+      OUTER_SPRINT report ~%report% - do not match~
+      COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee/%file%.bam~
+      COPY ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/sorted_bams/iwdee/%file%.bam~
+    END
+  END   
+
+  ACTION_IF pm_1 AND !pm_2 AND !pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - exclusive to BG%WNL%~  
+    COPY ~eefixpack/newbams/bgee/%file%.bam~  ~eefixpack/sorted_bams/bgee/%file%.bam~
+  END    
+
+  ACTION_IF !pm_1 AND pm_2 AND !pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - exclusive to BG2%WNL%~  
+    COPY ~eefixpack/newbams/bg2ee/%file%.bam~ ~eefixpack/sorted_bams/bg2ee/%file%.bam~
+  END     
+
+  ACTION_IF !pm_1 AND !pm_2 AND pm_3 BEGIN 
+    OUTER_SPRINT report ~%report% - exclusive to IWD%WNL%~  
+    COPY ~eefixpack/newbams/iwdee/%file%.bam~ ~eefixpack/sorted_bams/iwdee/%file%.bam~
+  END   
+  
+  APPEND_OUTER ~eefixpack/newbam.txt~ ~%report%%WNL%%WNL%~
+              
+END 
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_dirs BEGIN 
+
+  bgee       => sod
+  bgee_bg2ee => sod_bg2ee
+  bgee_iwdee => sod_iwdee
+  universal  => sod_bg2ee_iwdee
+  
+END 
+
+ACTION_PHP_EACH cd_dirs AS src => dst BEGIN 
+
+  ACTION_BASH_FOR ~eefixpack/files/bam/item_shadows/%src%~ ~.+\.bam~ BEGIN 
+
+    ACTION_IF !FILE_EXISTS_IN_GAME ~%BASH_FOR_FILE%~ BEGIN 
+      COPY "%BASH_FOR_FILESPEC%" ~eefixpack/files/bam/item_shadows/%dst%/%BASH_FOR_FILE%~
+      DELETE "%BASH_FOR_FILESPEC%"
+    END
+
+  END   
+  
+END 
+
+
+
+
+
+// for finding melee weapons without str flags
+COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+  READ_LONG 0x18 flags
+  PATCH_IF ((flags & BIT2) = 0) BEGIN // if undroppable
+    READ_LONG  0x64 abil_off
+    READ_SHORT 0x68 abil_num
+    FOR (index = 0 ; index < abil_num ; ++index) BEGIN
+      READ_BYTE  (abil_off + 0x00 + (index * 0x38)) type
+      READ_BYTE  (abil_off + 0x02 + (index * 0x38)) loc
+      READ_LONG  (abil_off + 0x26 + (index * 0x38)) aflags
+      READ_SHORT (abil_off + 0x1a + (index * 0x38)) dam
+      READ_BYTE  (abil_off + 0x18 + (index * 0x38)) dicenum
+      READ_BYTE  (abil_off + 0x16 + (index * 0x38)) dicesize
+      PATCH_IF (((type = 1) AND (loc = 1) AND ((aflags & BIT0) = 0)) AND
+                ((dam != 0) OR (dicenum != 0 AND dicesize != 0))) BEGIN
+        PATCH_PRINT "               ~%SOURCE_FILE%~ ~override~ // (iwdee) has a melee ability without strength bonus"
+      END
+    END
+  END
+  BUT_ONLY  
+  
+  
+// fixing silver dragon breath - I used this to adjust the x/y coordinates to match
+// up with the silver dragon creature animation. After these adjustments I used NI's
+// bam editor to pad out each sequence with blank frames so that it won't repeat
+  
+  ACTION_DEFINE_ASSOCIATIVE_ARRAY pro_offs BEGIN
+// move left: increase x
+// move up:   increase y
+
+   0, "-52", "-109" =>  0
+   8,  "-5", "-119" =>  8
+  16,  "40", "-104" => 16
+  24,  "83", "-110" => 24
+  32, "116",  "-88" => 32
+  40, "142",  "-67" => 40
+  48, "127",  "-35" => 48
+  56,  "61",  "-65" => 56
+  64,  "53",  "-58" => 64
+END  
+
+COPY_EXISTING ~spsdbur.bam~ ~override~
+  READ_ASCII 0x0 sg (4) //Signature
+  PATCH_IF NOT (~%sg%~ STRING_EQUAL_CASE ~BAMC~ = 1) BEGIN
+    PATCH_PRINT ~%SOURCE_FILE% is not a compressed BAM.~
+  END ELSE BEGIN
+    READ_LONG 0x8 dl //Uncompressed data length
+    DECOMPRESS_REPLACE_FILE 0xc (SOURCE_SIZE - 0xc) dl
+    READ_LONG  0x0c frame_offset
+    PATCH_PHP_EACH pro_offs AS var => idx BEGIN 
+      FOR (index = idx ; index <= (idx + 7) ; ++index) BEGIN 
+        WRITE_SHORT (frame_offset + 0x04 + (index * 0x0c)) THIS + var_1
+        WRITE_SHORT (frame_offset + 0x06 + (index * 0x0c)) THIS + var_2
+      END  
+    END  
+  END
+  BUT_ONLY
+  
+  
+  
+// used to find leftover copy-paste spellbooks such as
+// https://github.com/CamDawg/EE_Fixpack/commit/b19f8a311b7b7b7dff8c9702a1aeabe53197e697
+
+COPY_EXISTING ~shadowsu.cre~ ~override~
+  READ_LONG 0x2a0 known_off_base
+  READ_LONG 0x2a4 known_num_base
+  READ_LONG 0x2a8 minfo_off_base
+  READ_LONG 0x2ac minfo_num_base
+  READ_LONG 0x2b0 mem_off_base
+  READ_LONG 0x2b4 mem_num_base
+  READ_ASCII (known_off_base) known_orig (known_num_base * 0x0c)  
+  READ_ASCII (minfo_off_base) minfo_orig (minfo_num_base * 0x10)
+  READ_ASCII (mem_off_base)   mem_orig   (mem_num_base * 0x0c)
+  BUT_ONLY 
+  
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~  
+  READ_LONG 0x2a4 known_num
+  READ_LONG 0x2ac minfo_num
+  READ_LONG 0x2b4 mem_num
+  PATCH_IF ((known_num = known_num_base) AND (minfo_num = minfo_num_base) AND (mem_num = mem_num_base)) BEGIN 
+    READ_LONG 0x2a0 known_off
+    READ_LONG 0x2a8 minfo_off
+    READ_LONG 0x2b0 mem_off
+    READ_ASCII (known_off) known (known_num_base * 0x0c)  
+    READ_ASCII (minfo_off) minfo (minfo_num_base * 0x10)
+    READ_ASCII (mem_off)   mem   (mem_num_base * 0x0c)
+    PATCH_IF (("%known%" STRING_COMPARE_CASE "%known_orig%" = 0) AND 
+              ("%minfo%" STRING_COMPARE_CASE "%minfo_orig%" = 0) AND 
+              ("%mem%"   STRING_COMPARE_CASE "%mem_orig%"   = 0)) BEGIN
+      SPRINT file "%SOURCE_RES%"
+      TO_LOWER file
+      READ_LONG 0x0c name
+      PATCH_IF (name > 0) AND (name < 999999) BEGIN
+        READ_STRREF 0x0c name
+      END ELSE BEGIN
+        READ_STRREF 0x08 name
+      END
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^........$" = 0) BEGIN SPRINT spc " " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^.......$" = 0) BEGIN SPRINT spc "  " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^......$" = 0) BEGIN SPRINT spc "   " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^.....$" = 0) BEGIN SPRINT spc "    " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^....$" = 0) BEGIN SPRINT spc "     " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^...$" = 0) BEGIN SPRINT spc "      " END ELSE
+      PATCH_IF ("%file%" STRING_COMPARE_REGEXP "^..$" = 0) BEGIN SPRINT spc "       " END ELSE
+                                                          BEGIN SPRINT spc "        " END
+      PATCH_PRINT "    ~%SOURCE_FILE%~%spc%~override~ // %name%"
+    END 
+  END
+  BUT_ONLY 
+  
+  
+  
+  
+
+
+// infravision: checking creatures for being undead v. using an undead animation
+OUTER_SPRINT debug ~~
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~
+  SET undead = 0
+  SET undead_anim = 0
+  READ_BYTE 0x271 general
+  PATCH_IF general = 4 BEGIN SET undead = 1 END 
+  READ_LONG 0x28 anim
+  PATCH_IF ((anim = 0x2300) OR (anim = 0x6403) OR (anim = 0x7700) OR (anim = 0x7701) OR (anim = 0x7702) OR (anim = 0x7703) OR (anim = 0x7b04) OR (anim = 0x7b05) OR 
+            (anim = 0x7b06) OR (anim = 0x7d00) OR (anim = 0x7f0d) OR (anim = 0x7f0e) OR (anim = 0x7f12) OR (anim = 0x7f22) OR (anim = 0x7f30) OR (anim = 0x7f46) OR 
+            (anim = 0xe050) OR (anim = 0xe060) OR (anim = 0xe080) OR (anim = 0xe0f2) OR (anim = 0xe25e) OR (anim = 0xe25f) OR (anim = 0xe28f) OR (anim = 0xe292) OR 
+            (anim = 0xe294) OR (anim = 0xe300) OR (anim = 0xe310) OR (anim = 0xe320) OR (anim = 0xea10) OR (anim = 0xea20) OR (anim = 0xeb00) OR (anim = 0xeb10) OR 
+            (anim = 0xeb20) OR (anim = 0xec00) OR (anim = 0xec10) OR (anim = 0xec20) OR (anim = 0xee00) OR (anim = 0xee10)) BEGIN
+    SET undead_anim = 1
+  END
+  PATCH_IF ((!undead AND undead_anim) OR (undead AND !undead_anim)) BEGIN
+    READ_LONG 0x0c name
+    PATCH_IF (name > 0) AND (name < 999999) BEGIN
+      READ_STRREF 0x0c name
+    END ELSE BEGIN
+      READ_STRREF 0x08 name
+    END
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^........$" = 0) BEGIN SPRINT spc " " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.......$" = 0) BEGIN SPRINT spc "  " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^......$" = 0) BEGIN SPRINT spc "   " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.....$" = 0) BEGIN SPRINT spc "    " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^....$" = 0) BEGIN SPRINT spc "     " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^...$" = 0) BEGIN SPRINT spc "      " END ELSE
+    PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^..$" = 0) BEGIN SPRINT spc "       " END ELSE
+                                                        BEGIN SPRINT spc "        " END
+    TO_LOWER SOURCE_FILE
+    PATCH_IF undead BEGIN
+      SPRINT debug "%debug%%LNL%                ~%SOURCE_FILE%~%spc%~override~ // %name%: undead using non-undead animation %anim%" 
+    END ELSE BEGIN
+      SPRINT debug "%debug%%LNL%                ~%SOURCE_FILE%~%spc%~override~ // %name%: non-undead using undead animation %anim%" 
+    END
+  END
+  BUT_ONLY 
+PRINT ~%debug%~
+
+
+// used to find creatures who are missing proficiencies
+
+SILENT
+
+// grab these from tweaks - temp only
+INCLUDE ~eefixpack/files/lib/game_checks.tpa~
+INCLUDE ~eefixpack/files/lib/joinable_npc_array.tpa~
+
+ACTION_IF game_includes_sod BEGIN OUTER_SPRINT epilogue ~ IF_EXISTS~ END ELSE BEGIN OUTER_SPRINT epilogue ~~ END
+
+OUTER_FOR (index = 110 ; index < 118 ; ++index) BEGIN 
+  OUTER_SPRINT ~%index%_debug~ ~  COPY_EXISTING~
+END 
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_local_needed BEGIN END 
+
+ACTION_PHP_EACH JOINABLE_NPC_ARRAY AS file => dv BEGIN
+
+  ACTION_IF IS_AN_INT dv BEGIN // non-joinable NPC
+
+    COPY_EXISTING ~%file%~ ~override~
+      CLEAR_ARRAY cd_local_needed
+      READ_LONG  0x2c0 itm_num
+      READ_LONG  0x2b8 slot_off
+      FOR (index = 1 ; index < 5 ; ++index) BEGIN 
+        READ_SHORT (slot_off + 0x10 + (index * 0x02)) ref
+        PATCH_IF ((ref < itm_num) AND (ref >= 0)) BEGIN SET ~valid%index%~ = ref END ELSE BEGIN  SET ~valid%index%~ = "-1" END
+      END
+      PATCH_IF ((valid1 >= 0) OR (valid2 >= 0) OR (valid3 >= 0) OR (valid4 >= 0)) BEGIN // if there's a valid weapon reference
+        SPRINT cre_file ~%SOURCE_RES%~ // might get reset with INNER_ACTION
+        TO_LOWER cre_file
+        // find existing obg profs
+        FOR (index = 110 ; index < 118 ; ++index) BEGIN 
+          READ_BYTE index val
+          SET val = ("%val%" BAND 0b00000111) // acvtive prof value is only first three bits
+          SET $cd_profs_possessed("obg_%index%") = val
+        END 
+        // find existing bg2 profs
+        FOR (index = 89 ; index < 108 ; ++index) BEGIN // first reset values
+          SET $cd_profs_possessed("bg2_%index%") = 0
+        END      
+        SET $cd_profs_possessed("bg2_115") = 0 // clubs
+        READ_BYTE 0x33 fx_type
+        READ_LONG 0x2c4 fx_off
+        READ_LONG 0x2c8 fx_num
+        FOR (index = 0 ; index < fx_num ; ++index) BEGIN
+          READ_SHORT (fx_off        + (0x08 * fx_type) + (index * (0x30 + (0xd8 * fx_type)))) opcode
+          READ_SHORT (fx_off + 0x04 + (0x10 * fx_type) + (index * (0x30 + (0xd8 * fx_type)))) stars // use short to only capture active
+          READ_SHORT (fx_off + 0x08 + (0x10 * fx_type) + (index * (0x30 + (0xd8 * fx_type)))) prof  // use short to just grab prof value
+          PATCH_IF opcode = 233 BEGIN
+            SET $cd_profs_possessed("bg2_%prof%") = stars
+          END  
+        END
+        // now check weapons
+        SPRINT patch_string ~~
+        READ_LONG  0x2bc itm_off
+        FOR (index = 1 ; index < 5 ; ++index) BEGIN 
+          PATCH_IF ~valid%index%~ >= 0 BEGIN 
+            SET obg_prof = 0
+            READ_ASCII (itm_off + (0x14 * ~valid%index%~)) item
+            TO_LOWER item
+            PATCH_IF VARIABLE_IS_SET $cd_prof_db_bg2("%item%") BEGIN // if the item has been encountered in other creatures
+              SET obg_prof = $cd_prof_db_obg("%item%")
+              SET bg2_prof = $cd_prof_db_bg2("%item%")
+              SPRINT item_name $cd_prof_db_name("%item%")
+            END ELSE BEGIN    
+              PATCH_IF FILE_EXISTS_IN_GAME ~%item%.itm~ BEGIN
+                INNER_ACTION BEGIN 
+                
+                  COPY_EXISTING ~%item%.itm~ ~override~
+                    READ_BYTE 0x31 prof
+                    PATCH_IF prof BEGIN // if prof=0, there's no non-prof penalty
+                      READ_SHORT 0x1c type
+                      PATCH_MATCH type WITH
+                        20 BEGIN SET obg_prof = 110 SET $cd_prof_db_obg("%item%") = 110 END // large swords
+                        19 BEGIN SET obg_prof = 111 SET $cd_prof_db_obg("%item%") = 111 END // small swords
+                        16 BEGIN SET obg_prof = 111 SET $cd_prof_db_obg("%item%") = 111 END // daggers
+                        15 BEGIN SET obg_prof = 112 SET $cd_prof_db_obg("%item%") = 112 END // bows
+                        29 BEGIN SET obg_prof = 113 SET $cd_prof_db_obg("%item%") = 113 END // spears
+                        30 BEGIN SET obg_prof = 113 SET $cd_prof_db_obg("%item%") = 113 END // halberds
+                        17 BEGIN SET obg_prof = 114 SET $cd_prof_db_obg("%item%") = 114 END // maces
+                        21 BEGIN SET obg_prof = 114 SET $cd_prof_db_obg("%item%") = 114 END // hammers
+                        26 BEGIN SET obg_prof = 114 SET $cd_prof_db_obg("%item%") = 114 END // staves
+                        22 BEGIN SET obg_prof = 115 SET $cd_prof_db_obg("%item%") = 115 END // morningstars
+                        23 BEGIN SET obg_prof = 115 SET $cd_prof_db_obg("%item%") = 115 END // flails
+                        25 BEGIN SET obg_prof = 116 SET $cd_prof_db_obg("%item%") = 116 END // axes
+                        18 BEGIN SET obg_prof = 117 SET $cd_prof_db_obg("%item%") = 117 END // slings
+                        24 BEGIN SET obg_prof = 117 SET $cd_prof_db_obg("%item%") = 117 END // darts
+                        27 BEGIN SET obg_prof = 117 SET $cd_prof_db_obg("%item%") = 117 END // xbows
+                        DEFAULT  SET obg_prof =   0 SET $cd_prof_db_obg("%item%") =   0     // unknown type
+                      END  
+                      SET $cd_prof_db_bg2("%item%")= prof
+                      SET bg2_prof = prof
+                      READ_STRREF 0x0c item_name
+                      PATCH_IF ("%item_name%" STRING_COMPARE_REGEXP ~<Invalid Strref -?[0-9]+>~ = 0) BEGIN
+                        READ_STRREF 0x08 item_name
+                      END
+                      SPRINT $cd_prof_db_name("%item%") ~%item_name%~
+                    END  
+                    BUT_ONLY
+
+                END // inner action
+              END // file exists
+            END // VARIABLE_IS_SET
+            PATCH_IF obg_prof BEGIN // if this is now non-zero, it means we found a valid prof needed
+              SET has_prof = 0
+              PATCH_IF ((bg2_prof = 115) OR ((bg2_prof > 88) AND (bg2_prof < 108))) BEGIN // if valid bg2 proif value
+                PATCH_IF $cd_profs_possessed("bg2_%bg2_prof%") != 0 BEGIN SET has_prof = 1 END
+              END
+              // if no bg2 prof, check for oBG prof
+              PATCH_IF !has_prof BEGIN
+                PATCH_IF $cd_profs_possessed("obg_%obg_prof%") = 0 BEGIN // doesn't have a prof
+                  SPRINT $cd_local_needed("%obg_prof%") ~%item_name% (%item%)~
+                END   
+              END
+            END   
+          END // individual valid check
+        END // FOR loop
+      END // valid weapon check
+      SET do_once = 0
+      PATCH_PHP_EACH cd_local_needed AS prof => item2 BEGIN 
+        PATCH_IF !do_once BEGIN 
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^........$" = 0) BEGIN SPRINT spc " " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^.......$" = 0) BEGIN SPRINT spc "  " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^......$" = 0) BEGIN SPRINT spc "   " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^.....$" = 0) BEGIN SPRINT spc "    " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^....$" = 0) BEGIN SPRINT spc "     " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^...$" = 0) BEGIN SPRINT spc "      " END ELSE
+          PATCH_IF ("%cre_file%" STRING_COMPARE_REGEXP "^..$" = 0) BEGIN SPRINT spc "       " END ELSE
+                                                                  BEGIN SPRINT spc "        " END
+          SET do_once = 1
+        END  
+                                                                  
+        READ_STRREF 0x08 name
+        SPRINT ~%prof%_debug~ EVALUATE_BUFFER "%%prof%_debug%%WNL%                ~%cre_file%.cre~%spc%~override~ // %name% - needed for %item2%" 
+      END
+      BUT_ONLY  
+
+  END
+
+END
+
+VERBOSE
+
+ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_prof_debug BEGIN
+  110, ~0x6e~ => ~large sword~ 
+  111, ~0x6f~ => ~small sword~ 
+  112, ~0x70~ => ~bow~ 
+  113, ~0x71~ => ~spear~ 
+  114, ~0x72~ => ~blunt~ 
+  115, ~0x73~ => ~spiked~ 
+  116, ~0x74~ => ~axe~ 
+  117, ~0x75~ => ~missile~ 
+END
+
+ACTION_PHP_EACH cd_prof_debug AS params => desc BEGIN 
+  OUTER_SPRINT msg EVALUATE_BUFFER ~%%params_0%_debug%%WNL%    WRITE_BYTE %params_1% (THIS + 1) // needs %desc% pip%WNL%    BUT_ONLY%epilogue%~ 
+  OUTER_SET display = 0
+  OUTER_INNER_PATCH_SAVE msg ~%msg%~ BEGIN // remove line break between COPY_EXISTING and first entry
+    REPLACE_EVALUATE "COPY_EXISTING[%LNL%%MNL%%WNL%]+[ %TAB%]+~" BEGIN 
+      SET display = 1
+    END "COPY_EXISTING ~"
+  END  
+  ACTION_IF display BEGIN 
+    PRINT "%msg%"
+  END  
+END 
+
+
+
+
+// this was used to find spells and items with mismatching saves for further scrutiny
+// https://www.gibberlings3.net/forums/topic/39645-spells-and-items-with-mismatched-save-types/
+OUTER_SPRINT debug ~~
+COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+                          ~^.+\.spl$~ ~override~
+  READ_SHORT 0x68 abil_num ELSE 0
+  PATCH_IF abil_num BEGIN // 
+    SET abil_length    = 0x38
+    PATCH_IF ("%SOURCE_EXT%" STRING_COMPARE_CASE "spl" = 0) BEGIN
+      SET abil_length    = 0x28
+    END   
+    READ_LONG  0x6a fx_off   ELSE 0
+    READ_LONG  0x64 abil_off ELSE 0
+    READ_SHORT (abil_off + 0x1e + (abil_length * (abil_num - 1))) abil_fx_num
+    READ_SHORT (abil_off + 0x20 + (abil_length * (abil_num - 1))) abil_fx_idx
+    SET final_fx = abil_fx_num + abil_fx_idx
+    READ_SHORT 0x70 start_fx
+    SET save_spell = 0
+    SET save_breath = 0
+    SET save_death = 0
+    SET save_wand = 0
+    SET save_poly = 0
+    FOR (index = start_fx ; index < final_fx ; ++index) BEGIN
+      READ_LONG (fx_off + 0x24 + (index * 0x30)) saves
+      PATCH_IF ((saves & BIT0) = BIT0) BEGIN SET save_spell = 1 END
+      PATCH_IF ((saves & BIT1) = BIT1) BEGIN SET save_breath = 1 END
+      PATCH_IF ((saves & BIT2) = BIT2) BEGIN SET save_death = 1 END
+      PATCH_IF ((saves & BIT3) = BIT3) BEGIN SET save_wand = 1 END
+      PATCH_IF ((saves & BIT4) = BIT4) BEGIN SET save_poly = 1 END
+    END 
+    PATCH_IF (save_spell + save_breath + save_death + save_wand + save_poly) > 1  BEGIN 
+      READ_STRREF 0x0c name
+      PATCH_IF ("%name%" STRING_COMPARE_REGEXP ~<Invalid Strref -?[0-9]+>~ = 0) BEGIN
+        READ_STRREF 0x08 name
+      END
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^........$" = 0) BEGIN SPRINT spc " " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.......$" = 0) BEGIN SPRINT spc "  " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^......$" = 0) BEGIN SPRINT spc "   " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.....$" = 0) BEGIN SPRINT spc "    " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^....$" = 0) BEGIN SPRINT spc "     " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^...$" = 0) BEGIN SPRINT spc "      " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^..$" = 0) BEGIN SPRINT spc "       " END ELSE
+                                                                BEGIN SPRINT spc "        " END
+      TO_LOWER SOURCE_FILE                                                              
+      SPRINT debug "%debug%%WNL%              ~%SOURCE_FILE%~%spc%~override~ // %name%"
+    END  
+  END   
+  BUT_ONLY
+
+PRINT ~%debug%~
+  
+
+// finding melee items using projectiles  
+OUTER_SPRINT debug ~~
+COPY_EXISTING_REGEXP GLOB ~^.+\.itm$~ ~override~
+  SPRINT debug_local ~~
+  READ_SHORT 0x68 abil_num 
+  PATCH_IF abil_num BEGIN 
+    READ_LONG 0x64 abil_off
+    FOR (index = 0 ; index < abil_num ; ++index) BEGIN
+      READ_BYTE  (abil_off + 0x00 + (index * 0x38)) type
+      READ_SHORT (abil_off + 0x2a + (index * 0x38)) proj
+      PATCH_IF type = 1 AND proj > 1 BEGIN 
+        SPRINT debug_local ~%debug_local% - ability %index% uses %proj%~
+      END
+    END
+    PATCH_IF ("%debug_local%" STRING_COMPARE_CASE "") BEGIN     
+      READ_STRREF 0x0c name
+      PATCH_IF ("%name%" STRING_COMPARE_REGEXP ~<Invalid Strref -?[0-9]+>~ = 0) BEGIN
+        READ_STRREF 0x08 name
+      END
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^........$" = 0) BEGIN SPRINT spc " " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.......$" = 0) BEGIN SPRINT spc "  " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^......$" = 0) BEGIN SPRINT spc "   " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^.....$" = 0) BEGIN SPRINT spc "    " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^....$" = 0) BEGIN SPRINT spc "     " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^...$" = 0) BEGIN SPRINT spc "      " END ELSE
+      PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_REGEXP "^..$" = 0) BEGIN SPRINT spc "       " END ELSE
+                                                                BEGIN SPRINT spc "        " END
+      TO_LOWER SOURCE_FILE                                                              
+      SPRINT debug "%debug%%WNL%              ~%SOURCE_FILE%~%spc%~override~ // %name%%debug_local%"
+    END  
+  END   
+  BUT_ONLY
+  
+PRINT ~%debug%~
+  

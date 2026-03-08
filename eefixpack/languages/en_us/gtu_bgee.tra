@@ -28,8 +28,17 @@
 // [automatic scan] Issues: 1  | Surplus leading whitespace at line 1
 @2437 = ~'Tis a great service you have done the people of this area, but it merely makes up for your previous acts of violence within these walls. You will get but 2,000 gold, and then you will leave my sight! Be thankful the guard does not place you in chains, let alone reward you!~
 
+// "I'll none" > "I'll have none"
+@2608 = ~I'll have none of this, sir! Be thankful I don't turn you over to the guard!~
+
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @2610 = ~Oh dear! I couldn't hear a word you said, though if I had, I would have answered "more."~
+
+// "I'll none" > "I'll have none"
+@2612 = ~I'll have none of this, sir! Be thankful I don't turn you over to the guard!~
+
+// "I'll none" > "I'll have none"
+@2616 = ~I'll have none of this, sir! Be thankful I don't turn you over to the guard!~
 
 // [automatic scan] Issues: 1  | Surplus leading whitespace at line 1
 @2684 = ~'Tis flattering, but you are blinded by your passion. Truly see what is become of me. I should not age, but my spirit fades in this ugly place. Yours does as well, but from obsession over me.~
@@ -2150,13 +2159,14 @@ Requires:
 Weight: 3~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
+// adding (missile) to damage line
 @7351 = ~Eagle Bow: Protector of the Dryads
 In order to protect their community from an encroaching orc logging encampment, the hero Hannable the White was given this magnificent bow by the dryads of Gulthmere Forest. A deadly confrontation followed when the loggers dared to try to cut down a great oak tree, nearly killing the dryad linked to it. With the help of powerful forest animals, Hannable slew entire bands of orcs before any more damage was inflicted upon the wood. The orcs were forced to abandon their plans, lest they suffer the continued wrath of Hannable and the forest. Needless to say, the hero who aided the grateful dryads lived happily... nay, VERY happily ever after!
 
 STATISTICS:
 
 THAC0: +2
-Damage: +2
+Damage: +2 (missile)
 Speed Factor: 4
 Proficiency Type: Shortbow
 Type: Two-handed
@@ -2830,6 +2840,9 @@ Requires:
  3 Strength
 
 Weight: 2~
+
+// standardizing 'fireshield' to fireshield (blue), fireshield (red) or just fireshield
+@12061 = ~Fireshield~
 
 // [automatic scan] Issues: 3  | Surplus trailing whitespace at line 7 | Surplus trailing whitespace at line 8 | Surplus trailing whitespace at line 9
 @12140 = ~Armor
@@ -3785,6 +3798,12 @@ Casting a Goodberry spell creates 5 magical berries that the caster can carry wi
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @12343 = ~Innkeeper~
 
+// standardizing 'fireshield' to fireshield (blue), fireshield (red) or just fireshield
+@13000 = ~Fireshield~
+
+// standardizing 'fireshield' to fireshield (blue), fireshield (red) or just fireshield
+@13070 = ~Fireshield~
+
 // [automatic scan] Issues: 9  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 3 | Surplus trailing whitespace at line 5 | Surplus trailing whitespace at line 7 | Surplus trailing whitespace at line 9 | Surplus trailing whitespace at line 11 | Surplus trailing whitespace at line 13 | Surplus trailing whitespace at line 15 | Surplus trailing whitespace at line 17
 @13136 = ~History of Amn:
 
@@ -4314,9 +4333,6 @@ Peace returned to the city, and Waterdhavians to their labors. To inhibit discov
 @14571 = ~'Twould be good if you tithed a few coins now and then. The favor of gods is worth a few gold.~ [YESLK28]
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@14643 = ~Attack Roll~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @14905 = ~Candlekeep~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
@@ -4624,12 +4640,6 @@ Proficiency Type:~
 
 // [automatic scan] Issues: 1  | Surplus leading whitespace at line 1
 @16417 = ~'Ere there. You're Gorion's little whelp, aren't ya? Yeah, you match the description. You don't look so dangerous to me.~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@16466 = ~Turn Undead Mode~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@16468 = ~Find Trap Mode~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @16539 = ~It appears that one of the girdles in that ogre's fetish collection was, how can I phrase it... one of gender transformation? Unshey was not unsympathetic to this, ahem, rather unfortunate turn of events, however. In an effort to make amends she has offered us a copy of her book, entitled "High Cleric Unshey's Practical Guide to Bodily Health."~
@@ -5375,6 +5385,7 @@ Requires:
 Weight: 40~
 
 // [automatic scan] Issues: 3  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 4 | Surplus trailing whitespace at line 10
+// actually update to have 10' radius
 @22832 = ~Protection From Evil, 10' Radius
 (Abjuration)
 
@@ -5383,10 +5394,10 @@ Sphere: Protection
 Range: Touch
 Duration: 1 turn/level
 Casting Time: 7
-Area of Effect: 15-ft. radius
+Area of Effect: 10-ft. radius
 Saving Throw: None
 
-When this spell is cast, all allied creatures within a 15-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
+When this spell is cast, all allied creatures within a 10-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
 
 // [automatic scan] Issues: 2  | Surplus trailing whitespace at line 4 | Surplus trailing whitespace at line 10
 @22834 = ~Champion's Strength
@@ -5474,6 +5485,9 @@ Combine ingredients in container.
 Enjoy. Oh yes, enjoy.
 
 Notes to myself: Should probably be supplemented with something of nutritional value lest my bones become brittle as chalk. Perhaps the container?~
+
+// grammar: "know you are what you intend" -> "know who you are or what you intend"
+@23613 = ~I do not know what to say. I do not know who you are or what you intend. Speak your mind and then I will decide.~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @23806 = ~[DEMON KNIGHT 04]~ [SHAEL_04]
@@ -5680,9 +5694,6 @@ Requires:
  5 Strength
 
 Weight: 4~
-
-// [automatic scan] Issues: 1  | Surplus leading whitespace at line 1
-@24172 = ~has nothing to say to you.~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 16
 @24234 = ~MONK: Monks are warriors who pursue perfection through contemplation as well as action. They are versatile fighters, especially skilled in combat without weapons or armor. Though Monks cannot cast spells, they have a unique magic of their own: They channel a subtle energy, called ki, which allows them to perform amazing feats. The Monk's best known feat is their ability to stun an opponent with an unarmed blow.
@@ -6091,6 +6102,10 @@ Specialized (2 slots): The wielder's penalties are reduced to 0 with the main we
 
 Master (3 slots): The wielder's penalties are reduced to 0 with the main weapon and -2 with the off-hand weapon.~
 
+// standardizing 'fireshield' to fireshield (blue), fireshield (red) or just fireshield
+@25058 = ~Fireshield (Red)~
+@25059 = ~Fireshield (Blue)~
+
 // [automatic scan] Issues: 2  | Surplus trailing whitespace at line 4 | Surplus trailing whitespace at line 10
 @25364 = ~INQUISITOR: The Inquisitor has dedicated <PRO_HISHER> life to finding and eliminating practitioners of evil magic and defeating the forces of darkness, and <PRO_HISHER> god has provided <PRO_HIMHER> with special abilities toward that end.
 
@@ -6279,6 +6294,7 @@ Saving Throw: None
 Instantly and once each round for 1 turn after True Seeing is cast, all hostile Illusion/Phantasm spells in a 120-ft. radius around the caster will be dispelled. The spells affected are Reflected Image, Invisibility, Mirror Image, Non-Detection, Improved Invisibility, Shadow Door, Mislead, Project Image, and Simulacrum. The target's Magic Resistance, if any, does not affect this.~
 
 // [automatic scan] Issues: 3  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 4 | Surplus trailing whitespace at line 10
+// radius is actually 10'
 @25825 = ~Protection From Evil, 10' Radius
 (Abjuration)
 
@@ -6287,10 +6303,10 @@ Sphere: Protection
 Range: Touch
 Duration: 1 turn/level
 Casting Time: 7
-Area of Effect: 15-ft. radius
+Area of Effect: 10-ft. radius
 Saving Throw: None
 
-When this spell is cast, all allied creatures within a 15-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
+When this spell is cast, all allied creatures within a 10-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
 
 // [automatic scan] Issues: 6  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 5 | Surplus trailing whitespace at line 6 | Surplus trailing whitespace at line 8 | Surplus trailing whitespace at line 9 | Surplus trailing whitespace at line 10
 @25827 = ~Charm Person or Mammal
@@ -8278,6 +8294,20 @@ Requires:
 5 Strength
 
 Weight: 3~
+
+// dart of acid descript - refers to them as 'arrows' in flavor text > missiles
+@29060 = ~With the teeth of a black dragon for heads and the mighty wyrm's sinews for shafts, these wicked missiles dissolve into deadly acid on impact.
+
+STATISTICS:
+
+THAC0: +1
+Damage: 1d3+1, +1d6 acid damage (Save vs. Spell for none)
+Damage type: Missile
+Speed Factor: 1
+Proficiency Type: Dart
+Type: One-handed
+
+Weight: 0~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 3
 @30178 = ~Tutorial

@@ -6,21 +6,83 @@ ACTION_IF FILE_EXISTS ~eefixpack/languages/%LANGUAGE%/fixes_%game%.tph~ BEGIN
   INCLUDE ~eefixpack/languages/%LANGUAGE%/fixes_%game%.tph~
 END
 
+INCLUDE ~eefixpack/files/tph/launcher_damage_types.tph~ // many bows/xbows lack damage type in their description
+
 /////                                                  \\\\\
 ///// lua fixes                                        \\\\\
 /////                                                  \\\\\
 
+INCLUDE ~eefixpack/files/tph/debug_area_listings.tph~ // correcting area names/styles in console menu
+INCLUDE ~eefixpack/files/tph/a7/ui_quit_menu.tph~     // allow to force-quit the game if cutscene mode is active
+INCLUDE ~eefixpack/files/tph/a7/ui_null_damage_display.tph~ // fixes "(null)" damage display bug on inventory screen
+
+COPY_EXISTING ~ui.menu~ ~override~
+  // fix scrollbar position of kit selection list in the character creation menu
+  REPLACE_TEXTUALLY ~area 22 90 360 500\([ %TAB%%WNL%]+table "chargen.kit"\)~ ~area 22 90 352 500\1~
+BUT_ONLY
+
 /////                                                  \\\\\
-///// ids/2da fixes                                    \\\\\
+///// ids/2da/ini/gam fixes                            \\\\\
 /////                                                  \\\\\
 
+INCLUDE ~eefixpack/files/tph/a7/action_changestoremarkup_fix.tph~ // fix parameter order in the ChangeStoreMarkup() script action
 INCLUDE ~eefixpack/files/tph/a7/anim_3001.tph~ // fix missing creature animation definitions for Neothelid
-INCLUDE ~eefixpack/files/tph/tbd_object_ids.tph~ // tbd, cam: missing/dupe entries in object.ids
+INCLUDE ~eefixpack/files/tph/a7/cre_anim_fixes.tph~ // fix height offsets of health bar positions for creature animations
+INCLUDE ~eefixpack/files/tph/a7/iwd_movescale_fixes.tph~ // fixes movement rate in several creature animation definitions
+INCLUDE ~eefixpack/files/tph/a7/iwd_ghost_fix.tph~ // prevent exploding deaths of incorporeal undead
+INCLUDE ~eefixpack/files/tph/animation_ini_fixes.tph~ // errors in animation definitions
 INCLUDE ~eefixpack/files/tph/tbd_splprot_kitfix.tph~ // tbd, cam: fixing kit check to be a numerical equality check, not bitwise
+INCLUDE ~eefixpack/files/tph/infravision.tph~ // correcting animations subject to infravision
+INCLUDE ~eefixpack/files/tph/ids_sync.tph~ // sync race.ids, class.ids
+INCLUDE ~eefixpack/files/tph/splprot_workaround.tph~ // catches negative resistances for damage types
+
+// syncing damages.ids header between games (cosmetic)
+COPY_EXISTING ~damages.ids~ ~override~
+  REPLACE_TEXTUALLY ~^\(0x0001\)~ ~13%LNL%\1~ // bg2ee/iwdee
+  
+COPY ~eefixpack/files/2da/entries.2da~ ~override~ // had bg2 references
+
+APPEND ~object.ids~
+~57 EighthNearestEnemyOfType
+67 EighthNearestMyGroupOfType
+94 LastKilled
+95 NearestAllyOf
+96 SecondNearestAllyOf
+97 ThirdNearestAllyOf
+98 FourthNearestAllyOf
+99 FifthNearestAllyOf
+100 SixthNearestAllyOf
+101 SeventhNearestAllyOf
+102 EighthNearestAllyOf
+103 NinthNearestAllyOf
+104 TenthNearestAllyOf
+105 FarthestEnemyOf
+106 SecondFarthestEnemyOf
+107 ThirdFarthestEnemyOf
+108 FourthFarthestEnemyOf
+109 FifthFarthestEnemyOf
+110 SixthFarthestEnemyOf
+111 SeventhFarthestEnemyOf
+112 EighthFarthestEnemyOf
+113 NinthFarthestEnemyOf
+114 TenthFarthestEnemyOf~
+  
+APPEND ~specific.ids~ ~25 NISHRUU_HAKEASHAR~ // for nishruu/hakeashar fixes
+
+// tbd, cam
+// nymphs from 'call woodland beings' lack their confusion ability due to a spell not being ported
+APPEND ~spell.ids~ ~3704 NYMPH_CONFUSION~
+COPY ~eefixpack/files/spl/spin704.spl~ ~override~
+  SPRINT NYMPH_CONFUSION ~spin704~
 
 // tbd, cam
 // fixing missing starting equipment in HoW games for shaman, others
 COPY ~eefixpack/files/2da/25stweap.2da~ ~override~
+
+ACTION_IF FILE_EXISTS ~eefixpack/languages/%vo_lang%/sounds/cd_ch6a.wav~ BEGIN
+  INCLUDE ~eefixpack/files/tph/iwdee_alt_ch6.tph~ // alternatve ch 6 narration
+END
+
 /*
 luke
 **splprot.2da**
@@ -54,49 +116,54 @@ COPY_EXISTING ~7eyes.2da~ ~override~
   REPLACE_TEXTUALLY EXACT_MATCH "12*0x400000" "*"
   PRETTY_PRINT_2DA
 
-
-
 INCLUDE ~eefixpack/files/tph/clswpbon.tpa~ // tbd, cam: fix non-prof penalties for shadowdancers, mage-thieves
-
-
 
 // tbd, cam
 // regression: add full oiwd soundsets for iwdee now that engine fully supports them
 INCLUDE ~eefixpack/files/tph/iwdee_soundsets.tph~
- 
+
+// ar7004 has two entries; one is meant for ar7005
+COPY_EXISTING ~tracking.2da~ ~override~
+  REPLACE_TEXTUALLY ~AR7004[ %TAB%]+O_24861~ ~AR7005    O_24861~
+  BUT_ONLY
+
+ // tbd, graion: more consistent op5 setup, see header
+INCLUDE ~eefixpack/files/tph/tbd_ea_reallycharmed.tph~
+
+// ensure that ids tables are properly sorted
+COPY_EXISTING_REGEXP ~^.+\.ids$~ ~override~
+  LPF sort_ids END
+BUT_ONLY
+
 CLEAR_IDS_MAP // reload ids, if we end up having any changes
 
 /////                                                  \\\\\
 ///// mass copy/includes actions                       \\\\\
 /////                                                  \\\\\
 
-COPY ~eefixpack/files/bam/ixbow04.bam~  ~override~ // tbd, cam: fix light crossbow BAM
-     ~eefixpack/files/bam/ixbow09.bam~  ~override~ // tbd, cam: fix HQ light crossbow BAM
-     ~eefixpack/files/wav/#choke.wav~   ~override~ // ie-6009, cam: missing sound for talonite poison
-     ~eefixpack/files/2da/clabmo02.2da~ ~override~ // tbd, cam: borked kit ability table, dark moon monk
-     ~eefixpack/files/2da/clabmo03.2da~ ~override~ // tbd, cam: borked kit ability table, sun soul monk
-     ~eefixpack/files/2da/spwi417.2da~  ~override~ // tbd, cam: allow enchant weapon to be cast via contingency
-     ~eefixpack/files/bam/mdem~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, demogorgon
-     ~eefixpack/files/bam/mdr1~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, dragon red
-     ~eefixpack/files/bam/mdr2~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, dragon black
-     ~eefixpack/files/bam/mdr3~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, dragon silver
-     ~eefixpack/files/bam/mwdr~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, dragon white
-     ~eefixpack/files/bam/mwyv~         ~override~ // tbd, sam.: merging four-frame animations to fix issues, wyvern big
-     ~eefixpack/files/bam/cmnk1inv.bam~ ~override~ // monk (tutorial, not pc) paperdoll
-     ~eefixpack/files/2da/fogarea.2da~  ~override~ // tbd, cam: add basic 2das to enable fog
-     ~eefixpack/files/2da/fogpt.2da~    ~override~ // tbd, cam: add basic 2das to enable fog
-     ~eefixpack/files/bam/sppr314d.bam~ ~override~ // new unholy blight portrait icon
+COPY ~eefixpack/files/wav/#choke.wav~       ~override~ // ie-6009, cam: missing sound for talonite poison
+     ~eefixpack/files/2da/clabmo02.2da~     ~override~ // tbd, cam: borked kit ability table, dark moon monk
+     ~eefixpack/files/2da/clabmo03.2da~     ~override~ // tbd, cam: borked kit ability table, sun soul monk
+     ~eefixpack/files/2da/clabrn02.2da~     ~override~ // tbd, cam: table isn't borked, but does lack the last +1 missile bump
+     ~eefixpack/files/2da/spwi417.2da~      ~override~ // tbd, cam: allow enchant weapon to be cast via contingency
+     ~eefixpack/files/2da/fogarea.2da~      ~override~ // tbd, cam: add basic 2das to enable fog
+     ~eefixpack/files/2da/fogpt.2da~        ~override~ // tbd, cam: add basic 2das to enable fog
 
-// tbd, sam.
-// merging multi-part area animations to eliminate issues
-ACTION_FOR_EACH file IN
-  1000ms1 1105ms1 1201ms2 1400t001 1400t002 1400t003 1400t004 1400t005 3001ms1 3601ms1 
-  6013ms1 am0602c am0602d am0602k1 am0602k2 am0602l1 am0602l2 am0801b1 am0801b2 am0902l 
-  am0902l1 am0902l2 am0902l3 am0902l4 am2000a am2000a1 am2000a2 am2000a3 am2000a4 am2000b 
-  am2000b1 am2000b2 am2000b3 am2000b4 am2805b am2805c am414e11 am414e12 
-BEGIN  
-  COPY ~eefixpack/files/bam/area_anim/%file%.bam~ ~override~
-END  
+// cumulative BAM fixes: item shadows; merged 4-frame animations: demogorgon, dragon (red, black, silver, white), tanari, wyvern (plus shadow); 
+// monk paperdoll; unholy blight portrait icon; fix SC sequence for creature animation 0x7F07 GOLEM_CLAY; rle-encoding error for shroud 
+// of flame portrait icon; removing vamp shadows; fixed silver dragon breath; updated spell BAMs; merging multi-part area animations to 
+// eliminate issues; death knight anim touchups; cleaned up divine spell, bard song, seven eyes icons
+COPY ~eefixpack/files/bam/copy/bg2ee_iwdee~      ~override~
+     ~eefixpack/files/bam/copy/bgee_iwdee~       ~override~
+     ~eefixpack/files/bam/copy/iwdee~            ~override~
+     ~eefixpack/files/bam/copy/sod_bg2ee_iwdee~  ~override~
+     ~eefixpack/files/bam/copy/bgee_bg2ee_iwdee~ ~override~
+
+// installing BAM V2 resources
+INCLUDE ~eefixpack/files/tph/install_bam_v2.tph~
+ACTION_FOR_EACH bam_resref IN guiostur storstor BEGIN
+  LAF install_bam_v2 STR_VAR bam_resref END
+END
 
 // there's another section of INCLUDEs at the bottom if it should be late in the process
 INCLUDE ~eefixpack/files/tph/5943_mold_touch.tph~           // ie-5943 , cam: lots of mold touch fixes
@@ -126,7 +193,7 @@ luke
 */
 WITH_SCOPE BEGIN
   INCLUDE "eefixpack/files/tph/luke/7eyes/7eyes.tph"
-  LAUNCH_ACTION_FUNCTION "7EYESification" END
+  LAUNCH_ACTION_FUNCTION "7EYES" END
 END
 
 /*
@@ -136,6 +203,11 @@ luke
 WITH_SCOPE BEGIN
   INCLUDE "eefixpack/files/tph/luke/wing_buffet_vs_mr.tph"
   LAUNCH_ACTION_FUNCTION "WING_BUFFET_VS_MR" END
+END
+
+// argent77
+WITH_SCOPE BEGIN
+  INCLUDE "eefixpack/files/tph/a7/improved_troll_regeneration.tph"
 END
 
 /////                                                  \\\\\
@@ -149,7 +221,10 @@ COMPILE ~eefixpack/files/d/%game%_core_fixes.d~ // misc dialogue fixes
 /////                                                  \\\\\
 
 INCLUDE ~eefixpack/files/tph/tbd_iwd_locals_scripts.tph~ // tbd, cam - region/container scripts can't use LOCALS-scoped variables
-  
+INCLUDE ~eefixpack/files/tph/a7/iwd_luremaster.tph~ // luremaster cutscene fixes
+INCLUDE ~eefixpack/files/tph/a7/iwd_ldd_shriekers.tph~ // fixes shrieker behavior in Lower Dorn's Deep
+INCLUDE ~eefixpack/files/tph/a7/iwd_squirrels.tph~ // fixes scripting of summoned squirrels in Easthaven (finale)
+
 // tbd, cam
 // player ai checks if magical weapon present before casting shillelagh, but checks old resources
 COPY ~scripts/cleric1.bs~ ~scripts/cleric1.bs~
@@ -162,22 +237,53 @@ COPY ~scripts/cleric1.bs~ ~scripts/cleric1.bs~
   END
   BUT_ONLY
   
+COPY_EXISTING ~4001lpt1.bcs~ ~override~ // wrong scope on area var
+              ~4001lt1a.bcs~ ~override~
+              ~4001t1as.bcs~ ~override~
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~("5001_Alert_1","AR5001"~ ~("5001_Alert_1","MYAREA"~
+  END
+  BUT_ONLY
+
+// remove team 5 from Ilmadia's scripting (she's already team 2)
+// see also edits to ar8011.are
+COPY_EXISTING ~ar8011.bcs~ ~override~
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~!Global("SPRITE_IS_DEADILMADIA","GLOBAL",0)~ ~!Global("SPRITE_IS_DEADMAIDENILMADIA","GLOBAL",0)~
+    APPEND_FILE ~eefixpack/files/baf/iwd8011.baf~
+  END
+  BUT_ONLY
+
+// how finale, checking var that never gets set
+COPY_EXISTING ~ar9603.bcs~ ~override~
+  DECOMPILE_AND_PATCH BEGIN 
+    REPLACE_TEXTUALLY ~"BELHIEFET_DEAD","GLOBAL"~ ~"SPRITE_IS_DEADBELHIEFET","GLOBAL"~ // checking wrong var
+  END   
+
+// shaman summon script errors - fix for bgee, bg2ee, iwdee
+COPY_EXISTING ~bdshunsu.bcs~ ~override~ // chaman summun AI script
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~!\(Detect(\[PC\.0\.0\.SHAMAN\])[ %TAB%%LNL%%MNL%]+CombatCounter(0)\)~ // have to include extra line to avoid other blocks
+    	~\1~ // should be detect, not !detect (sod only)
+    REPLACE_TEXTUALLY ~\(MoveToObject(\[PC\.0\.0\.SHAMAN])\)~ ~\1 Continue()~ // don't block item bonuses with infinite Move commands
+  END   
+
 // tbd, cam
 // checking for ambients which don't exist
 COPY_EXISTING ~eepoqct1.bcs~ ~override~
   DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~AmbientActivate("1105MS1[0-7]",FALSE)~ ~~ 
+    REPLACE_TEXTUALLY ~AmbientActivate("1105MS1[0-7]",FALSE)~ ~~
   END
   BUT_ONLY
-  
+
 // ie-6015, cam
 // Jorn should heal all fellow barbarians (allies are BARBARIAN_1 to 8, script checks 0-7)
 COPY_EXISTING ~iljorn.bcs~ ~override~
   DECOMPILE_AND_PATCH BEGIN
-    REPLACE_TEXTUALLY ~BARBARIAN_0~ ~BARBARIAN_8~ 
+    REPLACE_TEXTUALLY ~BARBARIAN_0~ ~BARBARIAN_8~
   END
   BUT_ONLY
-  
+
 // ie-6014, cam
 // Loot should have charges: items from random treasure table with differing charges need to be re-added with charges
 ACTION_DEFINE_ASSOCIATIVE_ARRAY cd_rndtres_charges BEGIN
@@ -190,7 +296,7 @@ END
 ACTION_PHP_EACH cd_rndtres_charges AS params => area BEGIN
   EXTEND_BOTTOM ~%area%.bcs~ ~eefixpack/files/baf/rndtres_charges.baf~ EVALUATE_BUFFER
 END
-  
+
 // ie-6006, cam
 // Talonite Priests don't heal one another
 COPY_EXISTING ~d2talon3.bcs~ ~override~
@@ -199,8 +305,8 @@ COPY_EXISTING ~d2talon3.bcs~ ~override~
     REPLACE_TEXTUALLY ~TalonitePriest[14]~    ~Talonite~
     REPLACE_TEXTUALLY ~TalonitePriestess[23]~ ~Talonite~
   END
-  BUT_ONLY 
-  
+  BUT_ONLY
+
 // tbd, cam
 // potential softlock if party is split when yxunomei closes door as part of her ambush
 COPY_EXISTING ~d5yxudor.bcs~ ~override~
@@ -210,11 +316,36 @@ COPY_EXISTING ~d5yxudor.bcs~ ~override~
     REPLACE_TEXTUALLY ~!Global("YXUN_ATTACK","MYAREA",0)~ ~!Global("YXUN_ATTACK","MYAREA",0) OpenState(Myself,TRUE)~
     REPLACE_TEXTUALLY ~[ %TAB%]Lock(Myself)~ ~Lock(Myself) SetGlobalTimer("CDYxunDoor","ar4005",60)~
   END
-  BUT_ONLY  
+  BUT_ONLY
+
+COPY_EXISTING ~lwmurd.bcs~ ~override~
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~Global("CDMurduaghDaen","MYAREA",1)~ ~False()~
+    APPEND_FILE ~eefixpack/files/baf/lwmurd.baf~  
+  END
+  BUT_ONLY
+
+// The Voice of Durdel Anatha: fix blending mode of visual effect used by resurrection
+COPY_EXISTING ~lddurd01.bcs~ ~override~
+  DECOMPILE_AND_PATCH BEGIN
+    REPLACE_TEXTUALLY ~"sphollyw"~ ~"spholy"~
+  END
+BUT_ONLY
+
+INCLUDE ~eefixpack/files/tph/ending_cutscenes.tph~ // tightening end of cutscenes
 
 /////                                                  \\\\\
 ///// area fixes                                       \\\\\
 /////                                                  \\\\\
+
+// oIWD uses area actor names as DVs, which means they should be limited to 18 characters (not counting
+// spaces) so that SPRITE_IS_DEADfoo won't exceed 32 characters total.
+INCLUDE ~eefixpack/files/tph/tbd_iwdee_area_dv_fixes.tpa~
+
+INCLUDE ~eefixpack/files/tph/region_cursors.tph~ // 'Show Triggers On Tab' lua option exposes some hidden regions and traps
+
+COPY_EXISTING ~ar1015.are~ ~override~ // beetle has redundant script
+  LPF ALTER_AREA_ACTOR STR_VAR actor_name = ehbeetle script_override = ~~ END // name not unique, but it's ok since all shouldn't have override script
 
 // tbd, cam
 // dupe random treasure, two containers overlay one another
@@ -225,27 +356,57 @@ COPY_EXISTING ~ar6006.are~ ~override~
   LPF ALTER_AREA_ITEM STR_VAR match_item = rndtre57 item = scrl6j END // replace dupe random treasure with one of the items from the deleted container
   LPF ADD_AREA_ITEM INT_VAR container_to_add_to = 1 STR_VAR item_to_add = potn31 END // re-add the second deleted item
   BUT_ONLY
-  
+
 // ie-6016, cam
 // Untrapped doors shouldn't show as trapped
 COPY_EXISTING ~ar7000.are~ ~override~
   LPF ALTER_AREA_DOOR INT_VAR flag_detectable = 0 STR_VAR door_name = AR7000Door1 END
-  BUT_ONLY  
-  
+  BUT_ONLY
+
 COPY_EXISTING ~ar7002.are~ ~override~
   LPF ALTER_AREA_DOOR INT_VAR flag_detectable = 0 STR_VAR door_name = AR7002Door1 END
   BUT_ONLY
-  
+
+// remove team 5 from Ilmadia's scripting (she's already team 2)
+// see also edits to ar8011.bcs
+COPY_EXISTING ~ar8011.are~ ~override~
+  LPF ALTER_AREA_ACTOR STR_VAR script_default = "" actor_name = "Maiden Ilmadia" END
+  BUT_ONLY
+
 // ie-6017, cam
 // Wrong random treasures in HoW
 COPY_EXISTING ~ar9200.are~ ~override~ // swap back the old extres4 dupe fix
   LPF REPLACE_AREA_ITEM INT_VAR charges1 = 3 charges2 = 0 charges3 = 0 STR_VAR old_item = rndtre75 new_item = rndtre78 END // 3/0/0 charges for ogien/cloakin
   BUT_ONLY
-  
+
 COPY_EXISTING ~ar9601.are~ ~override~ // swap back the old extres4 dupe fix
-  LPF REPLACE_AREA_ITEM INT_VAR charges1 = 1 charges2 = 1 charges3 = 0 STR_VAR old_item = rndtre78 new_item = rndtre75 END // 1/1/0 charges for beltbon/helmsh/stomper  
+  LPF REPLACE_AREA_ITEM INT_VAR charges1 = 1 charges2 = 1 charges3 = 0 STR_VAR old_item = rndtre78 new_item = rndtre75 END // 1/1/0 charges for beltbon/helmsh/stomper
   BUT_ONLY
-  
+
+// one greater ice troll and one bergclaw don't have move scripts; also add random walk script to bergclaw to match others
+COPY_EXISTING ~ar9600.are~ ~override~ // can't use ALTER_AREA_ACTOR since names not unique, scripts not the same for others
+  READ_LONG  0x54 actor_off
+  READ_SHORT 0x58 actor_num
+  FOR (index = 0 ; index < actor_num ; ++index) BEGIN
+    READ_ASCII (actor_off + 0x80 + (index * 0x110)) cre_file
+    PATCH_IF ("%cre_file%" STRING_COMPARE_CASE "dlicetr" = 0) BEGIN
+      READ_SHORT (actor_off + 0x20 + (index * 0x110)) x_coord
+      READ_SHORT (actor_off + 0x22 + (index * 0x110)) y_coord
+      PATCH_IF ((x_coord = 1402) AND (y_coord = 2005)) BEGIN
+        WRITE_ASCII (actor_off + 0x58 + (index * 0x110)) ~gnt4move~ #8 // update general script
+      END
+    END
+    PATCH_IF ("%cre_file%" STRING_COMPARE_CASE "bergclaw" = 0) BEGIN
+      READ_SHORT (actor_off + 0x20 + (index * 0x110)) x_coord
+      READ_SHORT (actor_off + 0x22 + (index * 0x110)) y_coord
+      PATCH_IF ((x_coord = 401) AND (y_coord = 1442)) BEGIN
+        WRITE_ASCII (actor_off + 0x58 + (index * 0x110)) ~efrndw03~ #8 // update general script
+        WRITE_ASCII (actor_off + 0x68 + (index * 0x110)) ~gnt9move~ #8 // update race script
+      END
+    END
+  END
+  BUT_ONLY
+
 // ie-6013, cam
 // Harpies should despawn for lower level parties
 COPY_EXISTING ~ar9706.are~ ~override~ // only two harpy fiends should go away at CheckPartyAverageLevel(14,LESS_THAN)
@@ -253,7 +414,7 @@ COPY_EXISTING ~ar9706.are~ ~override~ // only two harpy fiends should go away at
   READ_LONG  0x54 actor_off
   READ_SHORT 0x58 actor_num
   FOR (index = 0 ; index < actor_num ; ++index) BEGIN
-    READ_ASCII (actor_off + 0x00 + (index * 0x110)) name 
+    READ_ASCII (actor_off + 0x00 + (index * 0x110)) name
     PATCH_IF ("%name%" STRING_COMPARE_CASE "HrpFnd_0" = 0) BEGIN
       WRITE_ASCIIE (actor_off + 0x00 + (index * 0x110)) ~HrpFnd_%harpy%~
       SET harpy += 1
@@ -261,14 +422,25 @@ COPY_EXISTING ~ar9706.are~ ~override~ // only two harpy fiends should go away at
   END
   BUT_ONLY
 
+COPY_EXISTING ~ar9714.are~ ~override~ // one boneguard lacks team script
+  LPF ALTER_AREA_ACTOR STR_VAR actor_name = "Boneguard Skeleton 6" script_class = ~gnteam4~ END
+
+// argent77
+// Fixes positioning issues with Brother Harken and Sister Incylia in the Fallen Temple
+WITH_SCOPE BEGIN
+  INCLUDE "eefixpack/files/tph/a7/iwd_brother_harken_fix.tph"
+END
+
 /////                                                  \\\\\
 ///// creature file fixes                              \\\\\
 /////                                                  \\\\\
 
-//INCLUDE ~eefixpack/files/tph/tbd_bulk_cre_fixes_iwdee.tph~ // bulk general changes (nothing actually here yet)
+INCLUDE ~eefixpack/files/tph/tbd_bulk_cre_fixes_iwdee.tph~ // bulk general changes
 
+INCLUDE ~eefixpack/files/tph/a7/iwd_blast_skeleton.tph~ // blast skeleton should self-destruct more reliably
 INCLUDE ~eefixpack/files/tph/tbd_elemental_summons.tph~ // tbd, cam: elemental prince summons shouldn't grant XP
-  
+INCLUDE ~eefixpack/files/tph/creature_profs.tph~ // provide bas profs to creatures to avoind non-prof thac0 penalties
+
 // ie-6035, cam
 // Why are constructs carrying gold?
 COPY_EXISTING ~biknight.cre~ ~override~ // black ice knight
@@ -279,11 +451,22 @@ COPY_EXISTING ~biknight.cre~ ~override~ // black ice knight
 ///// item file fixes                                  \\\\\
 /////                                                  \\\\\
 
-//INCLUDE ~eefixpack/files/tph/tbd_bulk_itm_fixes_iwdee.tph~ // bulk general changes (nothing here yet)
+INCLUDE ~eefixpack/files/tph/tbd_bulk_itm_fixes_iwdee.tph~ // bulk general changes
 
 INCLUDE ~eefixpack/files/tph/tbd_iwdee_146.tph~ // tbd, cam: fixes items that cast spells
 INCLUDE ~eefixpack/files/tph/tbd_energy_blades.tph~ // tbd, cam: per descript, energy blades should do missile damage, not slashing
-  
+INCLUDE ~eefixpack/files/tph/usability_arrow_bolt.tph~ // monks using arrows/bolts
+
+// bad luck visual should play on target, not wielder
+COPY_EXISTING ~bess.itm~ ~override~
+  LPF ALTER_EFFECT INT_VAR match_opcode = 61 target = 2 END 
+
+// mismatched icons between inventory and item ability
+COPY_EXISTING ~book06.itm~ ~override~
+              ~book08.itm~ ~override~
+  WRITE_ASCIIE 0x3a ~i%SOURCE_RES%~ #8
+  BUT_ONLY
+
 // ie-6019, cam
 // Portrait icon fixes for items
 COPY_EXISTING ~bootfox.itm~ ~override~ // boots of the fox: swap haste icon for movement speed increase
@@ -292,17 +475,29 @@ COPY_EXISTING ~bootfox.itm~ ~override~ // boots of the fox: swap haste icon for 
 COPY_EXISTING ~moonbla.itm~ ~override~
   LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 60 opcode = 142 parameter2 = 105 END
   BUT_ONLY
-COPY_EXISTING ~vexed.itm~ ~override~ // vexed armor: has 2x cold resist icon, one should be cursed instead  
+COPY_EXISTING ~vexed.itm~ ~override~ // vexed armor: has 2x cold resist icon, one should be cursed instead
   LPF ALTER_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 25 parameter2 = 35 multi_match = 1 END
   BUT_ONLY
-            
+
+// shortbows using longbow paperdoll/avatar animation
+COPY_EXISTING ~bow05.itm~   ~override~ // Shortbow
+              ~bow06.itm~   ~override~ // Shortbow +1
+              ~hqsbow.itm~  ~override~ // High Quality Shortbow
+              ~sbowebu.itm~ ~override~ // Shortbow of Ebullience +3
+              ~storm.itm~   ~override~ // Storm Bow +2
+  WRITE_ASCII 0x22 ~BS~ #2
+
 // tbd, cam
 // upgraded bren muller's crossbow needs feedback that effect was activated (copy bg2 Heartseeker's visuals)
 COPY_EXISTING ~cdxbowbm.itm~ ~override~
   LPF ADD_ITEM_EFFECT INT_VAR opcode =  61 target = 1 parameter1 = ((0 << 24) + (30 << 16) + (120 << 8)) parameter2 = (25 << 16) timing = 1 END // rgb fade
   LPF ADD_ITEM_EFFECT INT_VAR opcode = 141 target = 1 parameter2 = 24 timing = 1 END // rgb fade
   BUT_ONLY
-  
+
+// Oil of Second Chances should take a full round to apply, and shouldn't display "gulp"
+COPY_EXISTING ~chance.itm~ ~override~
+  LPF ALTER_EFFECT INT_VAR match_opcode = 139 opcode = 165 parameter1 = 0 timing = 0 duration = 6 resist_dispel = 0 END
+
 // ie-6007, cam - see also strings 8663, 8712, 8911, 40639, 25818, and 27373
 // Weapon damage corrections
 COPY_EXISTING ~clbhand.itm~ ~override~ // composite long bow of the hand
@@ -321,13 +516,19 @@ COPY_EXISTING ~storm.itm~ ~override~ // storm bow
 COPY_EXISTING ~flailsk.itm~ ~override~ // skullflail
   LPF ALTER_ITEM_HEADER INT_VAR header_type = 1 damage_bonus = 5 END // is +4 weapon, base flail damage is 1d6+1, so damage should be 1d6+5
   BUT_ONLY
-  
+
+// swapping stacking protection from 206/318/324 for 321
+// see also #cofear.spl, spin132.spl, sppr617.spl, spin161.spl, sppr250.spl, spwi101/b/c.spl
+COPY_EXISTING ~cwoslim.itm~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 318 match_parameter2 = 0 END
+  LPF CLONE_EFFECT INT_VAR match_opcode = 25 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
+
 // tbd, cam
 // item blocks spmindat, but isn't immune to hold
 COPY_EXISTING ~cwreve.itm~   ~override~ // attack - blocks spmindat
   LPF DELETE_EFFECT INT_VAR match_opcode = 296 STR_VAR match_resource = spmindat END
   BUT_ONLY
-  
+
 // ie-6023, cam
 // Weapon effect duration fixes - target both itm and spl so it can go before or after luke's seven eye fixes
 COPY_EXISTING ~dart03.itm~ ~override~ // dart of stunning: color glow expires early
@@ -339,7 +540,7 @@ COPY_EXISTING ~ghoult.itm~ ~override~ // ghoul touch should last six rounds
               ~ghoult.spl~ ~override~ // ghoul touch should last six rounds
   LPF ALTER_EFFECT INT_VAR silent = 1 match_duration = 25 duration = 36 END // bump up to six rounds
   BUT_ONLY IF_EXISTS
-  
+
 // tbd, cam
 // sword of days doesn't block all haste/slow spells
 COPY_EXISTING ~days.itm~ ~override~ // round out slow/haste immunity; david's stuff will add the immunity spellstates
@@ -355,21 +556,31 @@ COPY_EXISTING ~days.itm~ ~override~ // round out slow/haste immunity; david's st
   LPF CLONE_EFFECT INT_VAR check_headers = 0 match_opcode = 267 match_parameter1= 14023 parameter1 = 14668 END // immune to string slowed
   LPF CLONE_EFFECT INT_VAR check_headers = 0 match_opcode = 318 opcode = 169 parameter1= 0 parameter2 = 38 STR_VAR match_resource = spwi312 resource = ~~ END // immune to icon haste
   LPF CLONE_EFFECT INT_VAR check_headers = 0 match_opcode = 169 match_parameter2= 38 parameter2 = 41 END // immune to icon slow
-            
+
 // ie-5937, cam
 // darts of bone shouldn't have a saving throw on their APR boost
 COPY_EXISTING ~dobone.itm~ ~override~
   LPF ALTER_EFFECT INT_VAR match_opcode = 1 savingthrow = 0 END
   BUT_ONLY
-  
+
 // ie-6025, cam
 // Items blocking spells that they shouldn't
 COPY_EXISTING ~gvalor1.itm~ ~override~ // gauntlets of valor block haste, but should be blocking hold person
-  LPF ALTER_EFFECT STR_VAR match_resource = spwi305 resource = spwi306 END 
-  BUT_ONLY 
+  LPF ALTER_EFFECT STR_VAR match_resource = spwi305 resource = spwi306 END
+  BUT_ONLY
 COPY_EXISTING ~kinetic.itm~ ~override~ // lance of disruption confers immunity to lance of disruption, but doesn't need it (original item bug fixed, this 318 was a stopgap)
   LPF DELETE_EFFECT INT_VAR match_opcode = 318 STR_VAR match_resource = spwi328 END
   BUT_ONLY
+
+// move planetar dispel-on-hit to after vorpal effect so that death ward can work better (in bgee, bg2ee, iwdee.tph)
+COPY_EXISTING ~planetar.itm~ ~override~
+  LPF CLONE_EFFECT  INT_VAR match_opcode = 58 STR_VAR insert = last END
+  LPF DELETE_EFFECT INT_VAR match_opcode = 58 multi_match = 1 END
+
+// clone immunity to webtrav (web) projectile into web1p (single-target web) projectile immunity (in bgee, bg2ee, iwdee.tph)
+COPY_EXISTING ~plyspid.itm~  ~override~ // arcane polymorph spider
+              ~plyspid2.itm~ ~override~ // avenger sword spider
+  LPF CLONE_EFFECT INT_VAR match_opcode = 83 match_parameter2 = 319 parameter2 = 259 END // fortunately projectiles are all same value sin bg/bg2/iwd
 
 // tbd, cam
 // multiple permanent effects with durations
@@ -380,11 +591,11 @@ COPY_EXISTING ~potn10.itm~  ~override~ // (itm) Potion of Invisibility - causes 
 // elixir of health should cure intoxication, not set it to zero
 COPY_EXISTING ~potn17.itm~ ~override~ // Elixir of Health - set drunkenness to 0, just change to 'cure drunk' instead
   LPF ALTER_EFFECT INT_VAR match_opcode = 94 opcode = 164 parameter2 = 0 END // flesh out effects below
-  
+
 // ie-6026, cam - see also string updates to 14913 and 21627
 // Revert changes to Thrym Extract and War Hammer +4: Defender (had wrong effects which were documented as if intended)
 COPY_EXISTING ~thrym.itm~ ~override~ // should block effects on failed save
-  LPF CLONE_EFFECT INT_VAR match_opcode = 12 opcode = 318 parameter1 = 0 parameter2 = 0 timing = 0 duration = 6 dicesize = 0 dicenumber = 0 STR_VAR insert = below resource = thrym END 
+  LPF CLONE_EFFECT INT_VAR match_opcode = 12 opcode = 318 parameter1 = 0 parameter2 = 0 timing = 0 duration = 6 dicesize = 0 dicenumber = 0 STR_VAR insert = below resource = thrym END
   BUT_ONLY
 COPY_EXISTING ~u1ham5b.itm~  ~override~ // war hammer +4: defender: 20% heal
   LPF DELETE_EFFECT INT_VAR check_globals = 0 END // delete random heal, visuals
@@ -395,13 +606,25 @@ COPY_EXISTING ~u1ham5b.itm~  ~override~ // war hammer +4: defender: 20% heal
 COPY_EXISTING ~udagg4a.itm~  ~override~ // (itm) Chaos Dagger +3 - causes disease - portrait icon(s) 7
   LPF DELETE_EFFECT INT_VAR match_opcode = 142 END // deletes icon
   LPF ALTER_EFFECT INT_VAR match_opcode = 78 special = 7 END // attach icon to disease effect
-  
+
 // ie-6024, cam - see also strings 14432 and 18095
 // Two crossbows have the wrong strength requirement
 COPY_EXISTING ~uhxbw2a.itm~ ~override~ // finest heavy crossbow
               ~xbow01.itm~  ~override~ // heavy crossbow
   WRITE_SHORT 0x26 11 // min str
   BUT_ONLY
+
+// remove undocumented +2 save bonus from wand of fear
+// luke's 7 eyes fix farms the effects into wand02.spl, but save bonus is still on the item
+INCLUDE ~eefixpack/files/tph/wand02.tph~
+
+// wand of fire should be using IWD-style Agannazar's Scorcher, not BG2-style
+// see also strref 17654
+COPY_EXISTING ~wand05.itm~ ~override~
+  LPF CLONE_EFFECT  INT_VAR header = 1 match_opcode = 12 match_savingthrow = (BIT3 + BIT11 + BIT24) parameter1 = 0 dicenumber = 3 savingthrow = (BIT11 + BIT24)
+    special = 0 STR_VAR insert = first END // primary damage (needs to be moved above evasion check, changed from 6d6+6 save for half to 3d6 no save)
+  LPF DELETE_EFFECT INT_VAR header = 1 match_opcode = 12 match_savingthrow = (BIT3 + BIT11 + BIT24) END // delete old primary damage
+  LPF ALTER_EFFECT  INT_VAR header = 1 match_opcode = 12 match_savingthrow = (BIT3 + BIT10 + BIT24) parameter1 = 0 dicesize = 8 dicenumber = 2 END // change secondary damage from 6d6+6 to 2d8
 
 // tbd, cam
 // feedback with limited timing and/or duration
@@ -410,10 +633,20 @@ COPY_EXISTING ~wand08.itm~   ~override~ // (itm) Wand of Sleep - causes sleep - 
               ~wand19b.spl~  ~override~ // if run after luke's seven eye fixes, busted string is here instead
   LPF ALTER_EFFECT INT_VAR silent = 1 match_opcode = 139 timing = 1 duration = 0 END
   BUT_ONLY IF_EXISTS
-  
-  
-  
-  
+
+// acid storm lasts 15 rds in oIWD, so fix the wand to match
+COPY_EXISTING ~wandcor.itm~ ~override~ // Wand of Corrosion
+  LPF ALTER_EFFECT INT_VAR parameter1 = 15 parameter2 = 2 END // only effects are 146/48, so change all to cast at caster level 15, instantly
+
+// description says snilloc's does 4d8, which means it should be casting at a fixed level of four
+COPY_EXISTING ~wandfre.itm~ ~override~ // Wand of Freezing Death
+  LPF ALTER_EFFECT INT_VAR parameter1 = 4 parameter2 = 2 END // only effects are 146/48, so change all to cast at caster level 4, instantly
+
+// Hell's Bane should be usable by thieves, like other broad swords
+COPY_EXISTING ~zzc8hb.itm~ ~override~ // Hell's Bane +4
+  WRITE_LONG 0x1e THIS & `BIT22
+  BUT_ONLY
+
 
 /*
 luke
@@ -479,47 +712,29 @@ WITH_SCOPE BEGIN
   BUT_ONLY_IF_IT_CHANGES
 END
 
-/*
-luke
-**Three White Doves +3**
-- Redone from scratch via op326 (instead of op177)
-- Fixed incorrect probability values
-*/
-WITH_SCOPE BEGIN
-  INCLUDE "eefixpack/files/tph/luke/three_white_doves.tph"
-  LAUNCH_ACTION_FUNCTION "THREE_WHITE_DOVES" END
-END
-
-/*
-luke
-**Talon of the Gloomfrost +4, Holdfast Arrow +1**
-- Should display the Entangled icon instead of the Held icon
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "holdfst.itm" "override"
-                "talongf.itm" "override"
-    LPF "DELETE_EFFECT" INT_VAR "check_globals" = 0 "match_opcode" = 142 "match_parameter2" = 13 END // portrait icon -- move to subspell
-  BUT_ONLY
-END
-
 /////                                                  \\\\\
 ///// spell fixes                                      \\\\\
 /////                                                  \\\\\
 
 INCLUDE ~eefixpack/files/tph/tbd_bulk_spl_fixes_iwdee.tph~ // bulk general changes
 
+INCLUDE ~eefixpack/files/tph/bg2_iwd_common_spell_fixes.tph~    // spell fixes in common between bg2, iwd
+INCLUDE ~eefixpack/files/tph/bg_bg2_iwd_common_spell_fixes.tph~ // spell fixes in common between bg, bg2, and iwd
+
 INCLUDE ~eefixpack/files/tph/5919_iwdee_spider_spawn.tph~ // ie-5919, cam: spider spawn only summons giant spiders, should also summon phase and sword
-INCLUDE ~eefixpack/files/tph/tbd_simulacrum.tph~ // tbd, cam (from jmerry): simulacrum/projected images should have thief skills, but no shadow twin
 INCLUDE ~eefixpack/files/tph/tbd_324_traps_iwdee.tph~ // tbd, cam - game can crash if a spell-via-trap uses 318/324 vs. a spell without a name
 
-// tbd, cam (from jmerry)
-// prevent infinite feedback (and resultant crash) from interacting fireshield-ish effects by giving them a brief immunity to re-application
-INCLUDE ~eefixpack/files/tph/tbd_fireshields.tph~
 
 // tbd, davidw
 // circle of bone subspell has illegal character in sig
  COPY_EXISTING "#bonecir.spl" override WRITE_ASCII 0x0 "SPL "
-    
+
+// swapping stacking protection from 206/318/324 for 321
+// see also cwoslim.itm, spin132.spl, sppr617.spl, spin161.spl, sppr250.spl, spwi101/b/c.spl
+COPY_EXISTING ~#cofear.spl~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 206 END
+  LPF CLONE_EFFECT INT_VAR match_opcode = 24 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
+
 // feedback with limited timing and/or duration
 COPY_EXISTING ~#sunrund.spl~ ~override~ // (spl) <Invalid Strref -1> - causes blind - portrait icon(s) 8 - additional effects
               ~spin120.spl~  ~override~ // (spl) Retribution - causes sleep - additional effects
@@ -531,6 +746,13 @@ COPY_EXISTING ~#sunrund.spl~ ~override~ // (spl) <Invalid Strref -1> - causes bl
               ~spwi711.spl~  ~override~ // (spl) Sphere of Chaos - causes confusion hold sleep - portrait icon(s) 38 - additional effects
               ~spwi806.spl~  ~override~ // (spl) Great Shout - causes deafness pause sleep - portrait icon(s) 112 - additional effects
   LPF ALTER_EFFECT INT_VAR match_opcode = 139 timing = 1 duration = 0 END
+
+// axe of the minotaur lord is supposed to stun for 1d4 rounds, not 4 seconds
+COPY_EXISTING ~axemino.spl~ ~override~
+  LPF ALTER_EFFECT INT_VAR match_duration =  4 duration =  6 probability1 =  24 probability2 =  0 END // fix existing into 1-round stun
+  LPF CLONE_EFFECT INT_VAR match_duration =  6 duration = 12 probability1 =  49 probability2 = 25 STR_VAR insert = last END // clone 1-round stun into 2-round stun
+  LPF CLONE_EFFECT INT_VAR match_duration = 12 duration = 18 probability1 =  74 probability2 = 50 STR_VAR insert = last END // clone 2-round stun into 3-round stun
+  LPF CLONE_EFFECT INT_VAR match_duration = 18 duration = 24 probability1 = 100 probability2 = 75 STR_VAR insert = last END // clone 3-round stun into 4-round stun 
 
 // tbd, cam
 // crippling strike should extend t0 -10 for assassins
@@ -549,27 +771,29 @@ COPY_EXISTING ~backstab.spl~ ~override~
         WRITE_LONG (fx_off + 0x04 + ((index2 + abil_fx_idx) * 0x30)) (0 - index) // penalty
         WRITE_LONG (fx_off + 0x0e + ((index2 + abil_fx_idx) * 0x30)) 70          // duration
       END
-    END      
+    END
   END
-  BUT_ONLY  
-  
+  BUT_ONLY 
+
 // ie-5938, cam
 // Lich Touch should paralyze, not hold
 COPY_EXISTING ~ltouch.spl~ ~override~
-  LPF ALTER_EFFECT INT_VAR match_opcode = 175 opcode = 109 END  
+  LPF ALTER_EFFECT INT_VAR match_opcode = 175 opcode = 109 END
   BUT_ONLY
+
+// thac0 progression should be capped at 0, not 1
+COPY_EXISTING ~ohtmps1.spl~ ~override~ // holy power
+              ~sppr412.spl~ ~override~ // holy power
+  READ_SHORT 0x68 abil_num
+  PATCH_IF ("%SOURCE_RES%" STRING_COMPARE_CASE "ohtmps1" = 0) BEGIN SET start = 20 END ELSE BEGIN start = 14 END
+  FOR (index = start ; index < abil_num ; ++index) BEGIN
+    LPF ALTER_EFFECT INT_VAR header = index match_opcode = 54 parameter1 = 0 END
+  END
 
 // tbd, cam
 // stuns, but plays spmindat; iwd generally uses glows so change to that instead
 COPY_EXISTING ~spcl118.spl~  ~override~ // the siren's yearning—enthralls creatures - plays spmindat
   LPF ALTER_EFFECT INT_VAR match_opcode = 215 opcode = 8 parameter1 = ((46 << 8) + (56 << 16) + (0 << 24)) parameter2 = 255 STR_VAR match_resource = spmindat END
-  BUT_ONLY
-
-// tbd, cam
-// enrage is using berserk's spell icon
-COPY_EXISTING ~spcl321.spl~ ~override~
-  WRITE_ASCII 0x3a ~enrageb~ #8
-  LPF ALTER_SPELL_HEADER STR_VAR icon = ~enrageb~ END
   BUT_ONLY
 
 // ie-6027, cam
@@ -580,26 +804,23 @@ COPY_EXISTING ~%MONK_LAY_ON_HANDS%.spl~          ~override~ // spcl815 lay on ha
               ~%WIZARD_LARLOCH_MINOR_DRAIN%.spl~ ~override~ // spwi119 larloch's minor drain
               ~%WIZARD_VAMPIRIC_TOUCH%.spl~      ~override~ // spwi314 vampiric touch
   PATCH_FOR_EACH race IN 121 139 145 147 156 157 158 159 169 BEGIN // demonic mephit elemental genie (anti)solar (dark)planetar salamander
-    LPF CLONE_EFFECT INT_VAR match_opcode = 324 match_parameter2 = 55 parameter1 = race parameter2 = 104 END 
-  END   
+    LPF CLONE_EFFECT INT_VAR match_opcode = 324 match_parameter2 = 55 parameter1 = race parameter2 = 104 END
+  END
   BUT_ONLY
-  
+
+// chromatic orb missing 2d8 magic damage at levels 7+
+COPY_EXISTING ~spdr101.spl~ ~override~
+              ~spwi118.spl~ ~override~
+  LPF ADD_SPELL_EFFECT INT_VAR header = 6 opcode = 12 target = 2 parameter2 = (64 << 16) timing = 1 resist_dispel = 1 dicenumber = 2 dicesize = 8 END // adding missing 2d8 magic damage
+
 // ie-6029, cam
 // Hopelessness not always canceling Hope
-// "eefixpack\files\tph\luke\7eyes\7eyes.tph" follow-up
 COPY_EXISTING ~%INNATE_MOURNFUL_WAIL%.spl~ ~override~ // spin115 Mournful Wail; do separately since it has a 206 at top of stack
   LPF ALTER_EFFECT INT_VAR match_opcode = 139 probability1 = 100 END // play on all stuns
   LPF CLONE_EFFECT INT_VAR match_opcode = 139 opcode = 321 STR_VAR resource = spwi429 END // remove Emotion: Hope
-  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 44 END
-  LPF CLONE_EFFECT INT_VAR match_opcode = 45 opcode = 142 parameter1 = 0 parameter2 = 44 STR_VAR insert = last END
   BUT_ONLY
 COPY_EXISTING ~%CLERIC_SYMBOL_OF_HOPELESSNESS%.spl~ ~override~ // sppr716 Symbol: Hopelessness
-              ~%WIZARD_EMOTION_HOPELESSNESS%.spl~ ~override~ // spwi411
   LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 139 opcode = 321 parameter1 = 0 parameter2 = 0 STR_VAR resource = spwi429 END // remove Emotion: Hope
-  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 44 END
-  LPF DELETE_EFFECT INT_VAR match_opcode = 139 match_parameter1 = 14980 END
-  LPF CLONE_EFFECT INT_VAR match_opcode = 45 opcode = 142 parameter1 = 0 parameter2 = 44 STR_VAR insert = last END
-  LPF CLONE_EFFECT INT_VAR match_opcode = 45 opcode = 139 parameter1 = 14980 parameter2 = 0 timing = 1 duration = 0 STR_VAR insert = last END
   BUT_ONLY
 
 // ie-6033, cam
@@ -612,19 +833,28 @@ COPY_EXISTING ~%INNATE_GREAT_ROAR%.spl~ ~override~ // spin119 great roar
 // mismatching durations
 COPY_EXISTING ~spin120.spl~  ~override~ // (spl) Retribution - causes sleep - additional effects
   LPF ALTER_EFFECT INT_VAR match_duration = 85 duration = 8571 END // 139 dealt with elsewhere
-  
+
+// swapping stacking protection from 206/318/324 for 321
+// see also cwoslim.itm, #cofear.spl, sppr250.spl, spwi101/b/c.spl
+COPY_EXISTING ~spin132.spl~ ~override~
+              ~sppr617.spl~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 206 END
+  LPF CLONE_EFFECT INT_VAR match_opcode = 13 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
+
+COPY_EXISTING ~spin139.spl~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 318 match_parameter2 = 0 END
+  LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 146 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
+
+COPY_EXISTING ~spin161.spl~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 318 match_parameter2 = 0 END
+  LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 139 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
+
 // tbd, davidw
 // The projectile for Bombardier Beetle clouds has a duplicate string
 COPY_EXISTING ~%INNATE_BOMBARDIER_BEETLE_CLOUD%.spl~ ~override~ // spin191
   LPF DELETE_EFFECT INT_VAR match_opcode=139 match_parameter1=35568 multi_match=1 END // has two 'stunned' strings
   BUT_ONLY
-  
-// tbd, cam
-// nymphs from 'call woodland beings' lack their confusion ability due to a spell not being ported
-APPEND ~spell.ids~ ~3704 NYMPH_CONFUSION~
-COPY ~eefixpack/files/spl/spin704.spl~ ~override~
-  SPRINT NYMPH_CONFUSION ~spin704~ 
-  
+
 // ie-6028, cam
 // Charm via Mantle of Hell's Furnace does not work as expected or, really, at all
 COPY_EXISTING ~spitm99.spl~ ~override~
@@ -632,10 +862,24 @@ COPY_EXISTING ~spitm99.spl~ ~override~
   LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 opcode = 324 target = 2 parameter1 = 187 parameter2 = 115 duration = 1 STR_VAR resource = spitm99 END // block class != fire_elemental
   BUT_ONLY
 
+COPY_EXISTING ~sppr106.spl~ ~override~ // rather than multiple EFFs targeted at general IDS values, split as =4 and !=4
+  LPF DELETE_EFFECT INT_VAR match_opcode = 177 STR_VAR match_resource = ~#magstn1~ END
+  LPF ADD_SPELL_EFFECT INT_VAR insert_point = 999 opcode = 318 target = 2 parameter2 = 1 STR_VAR resource = sppr106 END // block 3d4 non-undead damage from undead 
+  LPF ADD_SPELL_EFFECT INT_VAR insert_point = 999 opcode =  12 target = 2 timing = 1 dicenumber = 3 dicesize = 4 END    // since they get their damage via eff
+  BUT_ONLY   
+
 // tbd, cam
 // IWDEE bug 321 should be subject to same MR check as AC effect
 COPY_EXISTING ~%CLERIC_ALICORN_LANCE%.spl~ ~override~ // sppr218
   LPF ALTER_EFFECT INT_VAR match_opcode = 321 resist_dispel = 1 END
+
+// evasion fixes - evasion checks should provide feedback
+COPY_EXISTING ~sppr323d.spl~ ~override~ // circle of bones
+              ~sppr603d.spl~ ~override~ // blade barrier
+              ~spwi313.spl~  ~override~ // skull trap
+              ~spwi615.spl~  ~override~ // chain lightning
+              ~spwi615b.spl~ ~override~ // chain lightning
+  LPF ALTER_EFFECT INT_VAR match_opcode = 318 opcode = 324 match_parameter2 = 63 END 
 
 // ie-5947, cam
 // Cloudburst should remove Fireshields
@@ -643,7 +887,7 @@ COPY_EXISTING ~%CLERIC_CLOUDBURST%.spl~ ~override~ // sppr325
   LPF CLONE_EFFECT INT_VAR match_opcode = 321 STR_VAR match_resource = firau1d6 resource = spwi403 END // fireshield blue
   LPF CLONE_EFFECT INT_VAR match_opcode = 321 STR_VAR match_resource = firau1d6 resource = spwi418 END // fireshield red
   LPF CLONE_EFFECT INT_VAR match_opcode = 206 STR_VAR match_resource = firau1d2 resource = sppr730d END // immune to aura of flaming death damage
-  
+
 // tbd, davidw
 // Storm Shell shouldn't stack with itself
 COPY_EXISTING ~%CLERIC_STORM_SHELL%.spl~ ~override~ // sppr327
@@ -672,22 +916,22 @@ COPY_EXISTING ~%CLERIC_BLOOD_RAGE%.spl~  ~override~ // sppr422
   LPF CLONE_EFFECT  INT_VAR match_opcode = 321 opcode = 206 timing = 0 duration = 120 STR_VAR match_resource = EVAL ~%CLERIC_BLOOD_RAGE%~ insert = last END
   LPF DELETE_EFFECT INT_VAR match_opcode = 321 STR_VAR match_resource = EVAL ~%CLERIC_BLOOD_RAGE%~ END
 
-// tbd, cam  
+// tbd, cam
 // iwdee fix: weird durations for 318/324s
 COPY_EXISTING ~%CLERIC_CLOUD_OF_PESTILENCE%.spl~ ~override~ // sppr423
-  LPF ALTER_EFFECT INT_VAR match_duration = 85 duration = 0 END 
+  LPF ALTER_EFFECT INT_VAR match_duration = 85 duration = 0 END
 
 // tbd, cam
 // iwdee fix: dupe 'unconscious' strings, remove redundant 318 at end
 COPY_EXISTING ~%CLERIC_SMASHING_WAVE%.spl~ ~override~ // sppr426
-  LPF DELETE_EFFECT INT_VAR match_opcode = 139 match_duration = 12 END 
-  LPF DELETE_EFFECT INT_VAR match_opcode = 318 match_parameter2 = 0 END 
+  LPF DELETE_EFFECT INT_VAR match_opcode = 139 match_duration = 12 END
+  LPF DELETE_EFFECT INT_VAR match_opcode = 318 match_parameter2 = 0 END
 
 // tbd, cam
 // stun icons provided by stun effect in EE, remove redundant 142
 COPY_EXISTING ~%CLERIC_SMASHING_WAVE%.spl~ ~override~ // sppr426
               ~%CLERIC_WHIRLWIND%.spl~     ~override~ // sppr617
-  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 55 END 
+  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 55 END
 
 // ie-5946, cam
 // Wall of Moonlight should not interact with spell protections
@@ -696,6 +940,15 @@ COPY_EXISTING ~%CLERIC_WALL_OF_MOONLIGHT%.spl~ ~override~ // sppr428
 COPY_EXISTING ~%CLERIC_WALL_OF_MOONLIGHT%a.spl~ ~override~ // sppr428a
               ~%CLERIC_WALL_OF_MOONLIGHT%b.spl~ ~override~ // sppr428b
   LPF ALTER_EFFECT INT_VAR match_opcode = 12 power = 0 resist_dispel = 0 END
+
+COPY_EXISTING ~sppr518a.spl~ ~override~ // rwotf effects for same alignment
+  PATCH_FOR_EACH spell IN spwi305 spra301 sppr518a BEGIN // remove 321s for spells with fatigue - stacking with normal haste provides no further benefits
+    LPF DELETE_EFFECT INT_VAR match_opcode = 321 STR_VAR match_resource = EVAL ~%spell%~ END
+  END  
+  LPF ALTER_EFFECT INT_VAR match_opcode = 93 resist_dispel = 0 END // can't dispel fatigue
+  LPF CLONE_EFFECT INT_VAR match_opcode = 54 opcode = 332 END // clone to-hit bonus to damage bonus
+  LPF CLONE_EFFECT INT_VAR match_opcode = 54 opcode = 206 parameter1 = 0 STR_VAR resource = sppr518a insert = last END // use 206 to prevent stack rather than 321
+  BUT_ONLY   
 
 // tbd, cam
 // IWDEE bug 321 should be timing 1/dur 0
@@ -707,32 +960,95 @@ COPY_EXISTING ~%CLERIC_SPIKE_STONES%.spl~ ~override~ // sppr519
 COPY_EXISTING ~%CLERIC_ANIMAL_RAGE%.spl~  ~override~ // sppr522
   LPF DELETE_EFFECT INT_VAR match_opcode = 321 match_timing = 4 END
 COPY_EXISTING ~%CLERIC_ANIMAL_RAGE%b.spl~  ~override~ // sppr522b
-  LPF ALTER_EFFECT INT_VAR power = 5 END
+  LPF ALTER_EFFECT INT_VAR power = 0 END
 
 // ie-5942, cam
 // Mass Cause Light Wounds should not be available to druids
 COPY_EXISTING ~%CLERIC_MASS_CAUSE_LIGHT_WOUNDS%.spl~ ~override~ // sppr523.spl
   WRITE_LONG 0x1e (THIS BOR BIT31) // adds druid flag
- 
+
+COPY_EXISTING ~sppr606.spl~ ~override~ // fire seeds
+  READ_SHORT 0x68 abil_num // duration calculations are still using oIWD rounds (seven seconds, not the BG2/EE six), so every duration is 7/6 longer than it should be
+  FOR (index = abil_num ; index > 0 ; --index) BEGIN
+    LPF ALTER_EFFECT INT_VAR header = (index - 1) match_duration = (((30 - abil_num) + index) * 70) duration = (((30 - abil_num) + index) * 60) END 
+  END   
+
+// false dawn fixes - push blindness, damage to subspells for 7 eyes
+COPY_EXISTING ~sppr609.spl~ ~override/sppr609a.spl~ // damage
+  WRITE_LONG 0x08 `0 // blank name
+  LPF ALTER_HEADER INT_VAR projectile = "1" END // no projectile 
+  PATCH_FOR_EACH op IN 174 318 324 74 142 139 BEGIN 
+    LPF DELETE_EFFECT INT_VAR match_opcode = op END
+  END
+COPY_EXISTING ~sppr609.spl~ ~override/sppr609d.spl~ // blind
+  WRITE_LONG 0x08 `0 // blank name
+  LPF ALTER_HEADER INT_VAR projectile = "1" END // no projectile 
+  PATCH_FOR_EACH op IN 174 318 324 12 BEGIN 
+    LPF DELETE_EFFECT INT_VAR match_opcode = op END
+  END     
+COPY_EXISTING ~sppr609.spl~ ~override~ // main
+  LPF DELETE_EFFECT INT_VAR match_opcode = 142 END
+  LPF DELETE_EFFECT INT_VAR match_opcode = 139 END
+  LPF ALTER_EFFECT INT_VAR match_opcode = 12 opcode = 326 parameter2 = 0 dicenumber = 0 dicesize = 0 savingthrow = 0 STR_VAR resource = sppr609a END // op 12 > 326 for damage
+  LPF ALTER_EFFECT INT_VAR match_opcode = 74 opcode = 326 timing = 1 duration = 0 STR_VAR resource = sppr609d END  
+
 // tbd, davidw
 // entropy shield (remove spurious protection from Breach/Spellstrike/Imprisonment; doesn't protect against Flame Strike)
 COPY_EXISTING "%CLERIC_ENTROPY_SHIELD%.spl" ~override~ // sppr615
   LPF DELETE_EFFECT INT_VAR match_opcode=83 match_parameter2=54 END // remove immunity to SPARKLGR projectile
   PATCH_FOR_EACH resource IN sppr503 spimix01 ohbeflam BEGIN // clone one flamestrike immunity to cover other flamestrike variants
-    LPF CLONE_EFFECT STR_VAR match_resource=sppr984 resource END      
+    LPF CLONE_EFFECT STR_VAR match_resource=sppr984 resource END
   END
   BUT_ONLY
-  
+
 // tbd, cam
 // oiwd fix
 COPY_EXISTING ~%CLERIC_WHIRLWIND%.spl~  ~override~ // sppr617
-  LPF ALTER_EFFECT INT_VAR match_resist_dispel = 0 resist_dispel = 1 END 
+  LPF ALTER_EFFECT INT_VAR match_resist_dispel = 0 resist_dispel = 1 END
+
+// headers added to extend spells to iwd level 30 cap all have incorrect durations
+COPY_EXISTING ~sppr706.spl~ ~override~ // symbol, fear
+              ~sppr718.spl~ ~override~ // symbol, stun
+              ~spwi811.spl~ ~override~ // symbol, fear
+              ~spwi816.spl~ ~override~ // symbol, stun
+  LPF CD_TRIM-O-MATIC INT_VAR level_cap = 21 END // trim off incorrect headers
+  LPF CD_EXTEND-O-MATIC INT_VAR dur_special = 1 step_size = 3 step_dur = 6 END // 2 rds + 1 rd/3 levels
+
+// headers added to extend spells to iwd level 30 cap all have incorrect durations
+COPY_EXISTING ~sppr711.spl~ ~override~ // regeneration
+              ~sppr730.spl~ ~override~ // aura of flaming death
+              ~sppr740.spl~ ~override~ // wither
+  LPF CD_TRIM-O-MATIC INT_VAR level_cap = 20 END // trim off incorrect headers
+  LPF CD_EXTEND-O-MATIC INT_VAR dur_special = 1 step_size = 2 step_dur = 6 END // 1 rd/2 levels
+
+COPY_EXISTING ~sppr720.spl~ ~override~ // earthquake: "creatures with 10 or more Hit Dice are unaffected by this spell"
+  LPF CLONE_EFFECT INT_VAR multi_match = 1 match_opcode = 324 parameter1 = 0 parameter2 = 0 dicenumber = 99 dicesize = 10 END
+  BUT_ONLY   
+
+// evasion fixes - missing evasion check
+COPY_EXISTING ~sppr725d.spl~ ~override~ // aura o' flaming death
+  LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 opcode = 324 target = 2 parameter2 = 63 STR_VAR resource = "sppr725d" END 
+
+COPY_EXISTING ~spra302.spl~ ~override~ // Minor Spell Deflection [ranger]
+  LPF DELETE_EFFECT INT_VAR header = 6 multi_match = 1 match_opcode = 233 END // dupe 233s ar level 11
+  LPF ALTER_EFFECT INT_VAR header = 6 match_duration = 180 duration = 198 END // some durations wrong when cast at level 11
+
+// death fog's slow icon could be blocked on round 2+
+COPY_EXISTING ~spwi030.spl~ ~override~ // via trap
+              ~spwi614.spl~ ~override~ // via trap
+  LPF DELETE_EFFECT INT_VAR match_opcode = 142 END // delete from end of effect stack
+  LPF CLONE_EFFECT INT_VAR match_opcode = 126 opcode = 142 parameter1 = 0 parameter2 = 41 END // move to middle
+
+// swapping stacking protection from 206/318/324 for 321
+// see also cwoslim.itm, #cofear.spl, spin132.spl, sppr617.spl, spin161.spl, sppr250.spl, spwi101b/c.spl
+COPY_EXISTING ~spwi101.spl~ ~override~
+  LPF DELETE_EFFECT INT_VAR match_opcode = 206 END
 
 // tbd, cam
-// stun icons provided by stun effect, remove redundant 142  
+// stun icons provided by stun effect, remove redundant 142
 COPY_EXISTING ~%WIZARD_ICELANCE%.spl~    ~override~ // spwi327
               ~%WIZARD_GREAT_SHOUT%.spl~ ~override~ // spwi806
-  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 55 END 
+  LPF DELETE_EFFECT INT_VAR match_opcode = 142 match_parameter2 = 55 END
 
 // ie-6030, cam
 // Stoneskin provides too many skins at all levels
@@ -744,12 +1060,12 @@ COPY_EXISTING ~%WIZARD_STONE_SKIN%.spl~ ~override~ // spwi408
   BUT_ONLY
 
 // ie-5941, 1i-6031, cam
-// iwdee: not always checking MR correctly  
+// iwdee: not always checking MR correctly
 COPY_EXISTING ~%WIZARD_BELTYNS_BURNING_BLOOD%.spl~ ~override~ // spwi422
   PATCH_FOR_EACH op IN 61 142 174 215 321 333 BEGIN // everything but the portrait icon is wrong except at header 0
     LPF ALTER_EFFECT INT_VAR match_opcode = op resist_dispel = 1 END
-  END  
- 
+  END
+
 // ie-5940, cam
 // Emotion, Fear bypasses save/MR checks for removing Emotion, Courage
 COPY_EXISTING ~%WIZARD_EMOTION_FEAR%.spl~ ~override~ // spwi428
@@ -761,10 +1077,39 @@ COPY_EXISTING ~%WIZARD_SHOUT%.spl~       ~override~ // spwi431
               ~%WIZARD_GREAT_SHOUT%.spl~ ~override~ // spwi806
   LPF CLONE_EFFECT INT_VAR silent = 1 match_opcode = 80 opcode = 142 parameter2 = 112 END // clone deaf into deafness icon
 
+// shroud of flame shouldn't cause 100% fire resistant creatures to burst into flames
+COPY_EXISTING ~spwi524.spl~  ~override~
+              ~spwi524b.spl~ ~override~
+              ~spwi524c.spl~ ~override~
+  LPF ALTER_EFFECT INT_VAR silent = 1 match_opcode = 318 opcode = 324 END // from evasion fixes - update 318s to 324s
+  LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 opcode = 324 target = 2 parameter2 = 3 STR_VAR resource = EVAL ~%SOURCE_RES%~ END
+
 // ie-6032, cam
 // Tenser's Transformation shouldn't block innate abilities
+// thac0 progression should be capped at -2 (base fighter 0 + 2 bonus)
 COPY_EXISTING ~%WIZARD_TENSERS_TRANSFORMATION%.spl~ ~override~ // spwi603
-  LPF ALTER_EFFECT INT_VAR match_opcode = 145 match_parameter2 = 2 parameter2 = 3 END
+//  LPF ALTER_EFFECT INT_VAR match_opcode = 145 match_parameter2 = 2 parameter2 = 3 END // disable since i'm already having to go through manually
+  READ_LONG  0x64 abil_off
+  READ_SHORT 0x68 abil_num
+  READ_LONG  0x6a fx_off
+  FOR (index = 0 ; index < abil_num ; ++index) BEGIN
+    READ_SHORT (abil_off + 0x10 + (index * 0x28)) min_lev
+    READ_SHORT (abil_off + 0x1e + (index * 0x28)) abil_fx_num
+    READ_SHORT (abil_off + 0x20 + (index * 0x28)) abil_fx_idx
+    SET thac0 = 19 - min_lev
+    PATCH_IF thac0 < "-2" BEGIN SET thac0 = "-2" END
+    PATCH_IF min_lev = 1 BEGIN SET thac0 = 7 END
+    FOR (index2 = 0 ; index2 < abil_fx_num ; ++index2) BEGIN
+      READ_SHORT (fx_off + 0x00 + ((index2 + abil_fx_idx) * 0x30)) opcode
+      READ_LONG  (fx_off + 0x08 + ((index2 + abil_fx_idx) * 0x30)) parameter2
+      PATCH_IF opcode = 145 AND parameter2 = 2 BEGIN // disable spellcasting: innate
+        WRITE_LONG  (fx_off + 0x08 + ((index2 + abil_fx_idx) * 0x30)) 3 // change to magical
+      END ELSE
+      PATCH_IF opcode = 54 BEGIN // thac0
+        WRITE_LONG  (fx_off + 0x04 + ((index2 + abil_fx_idx) * 0x30)) thac0 // change to magical
+      END
+    END
+  END
   BUT_ONLY
 
 // tbd, cam
@@ -773,77 +1118,27 @@ COPY_EXISTING ~spwi714.spl~  ~override~ // (spl) Prismatic Spray - causes blind 
   LPF ALTER_EFFECT INT_VAR match_opcode = 142 match_duration = 308571 timing = 1 duration = 0 END // make permanent
 
 // tbd, cam
-// iwdee bug: use 176 for movement speed, 321 needs save  
+// iwdee bug: use 176 for movement speed, 321 needs save
 COPY_EXISTING ~%WIZARD_SUFFOCATE%.spl~ ~override~ // spwi726
   LPF ALTER_EFFECT INT_VAR match_opcode = 321 savingthrow = BIT0 END
   LPF ALTER_EFFECT INT_VAR match_opcode = 126 opcode = 176 END
 
-// tbd, davidw 
+// tbd, davidw
 // Mind Blank is supposed to protect against petrification
 COPY_EXISTING ~%WIZARD_MIND_BLANK%.spl~ ~override~ // spwi802
   LPF CLONE_EFFECT INT_VAR match_opcode=101 match_parameter2=175 parameter2=134 END // immune to petrification opcode
   LPF CLONE_EFFECT INT_VAR match_opcode=267 match_parameter1=14102 parameter1=14127 END // immune to petrification string
   LPF CLONE_EFFECT INT_VAR match_opcode=169 match_parameter2=3 parameter2=171 END // immune to petrification icon
-  BUT_ONLY 
- 
+  BUT_ONLY
+
 // ie-5939, cam
 // Great Shout duplicates combat feedback on a failed save
-WITH_SCOPE BEGIN
-  COPY_EXISTING - ~%WIZARD_GREAT_SHOUT%.spl~ ~override~ // spwi806 great shout
-    GET_OFFSET_ARRAY ab_arr SPL_V10_HEADERS
-    PHP_EACH ab_arr AS ab_ind => ab_off BEGIN
-      GET_OFFSET_ARRAY2 fx_arr ab_off SPL_V10_HEAD_EFFECTS
-      PHP_EACH fx_arr AS fx_ind => fx_off BEGIN
-        PATCH_MATCH SHORT_AT fx_off WITH
-          326 WHEN LONG_AT (0x8 + fx_off) = 111 BEGIN
-            PATCH_MATCH SLONG_AT (0x4 + fx_off) WITH
-              IDS_OF_SYMBOL("splstate" "STUN_IMMUNITY") IDS_OF_SYMBOL("splstate" "DEAF_IMMUNITY") BEGIN
-                READ_ASCII (0x14 + fx_off) subspell
-                // patch subspell
-                PATCH_WITH_SCOPE BEGIN
-                  INNER_ACTION BEGIN
-                    COPY_EXISTING "%subspell%.spl" "override"
-                      GET_OFFSET_ARRAY ab_arr SPL_V10_HEADERS
-                      PHP_EACH ab_arr AS ab_ind => ab_off BEGIN
-                        GET_OFFSET_ARRAY2 fx_arr ab_off SPL_V10_HEAD_EFFECTS
-                        PHP_EACH fx_arr AS fx_ind => fx_off BEGIN
-                          PATCH_MATCH LONG_AT (fx_off + 0x24) WITH
-                            0 BEGIN
-                              READ_ASCII fx_off $temp_arr("%fx_ind%") (0x30)
-                              WRITE_SHORT fx_off 999
-                            END
-                            DEFAULT
-                          END
-                        END
-                      END
-                      LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 999 END
-                      LPF CLONE_EFFECT INT_VAR silent = 1 match_opcode = 80 opcode = 139 timing = 1 duration = 0 parameter1 = 14073 STR_VAR insert = below END
-                      LPF ADD_SPELL_EFFECT INT_VAR opcode = 206 target = 2 savingthrow = BIT0 parameter1 = "-1" resist_dispel = 3 STR_VAR resource = "%DEST_RES%" END
-                      PHP_EACH temp_arr AS "" => fx_data BEGIN
-                        INSERT_BYTES (LONG_AT 0x6A + 0x30 * SHORT_AT (LONG_AT 0x64 + 0x1E)) 0x30
-                        WRITE_ASCII (LONG_AT 0x6A + 0x30 * SHORT_AT (LONG_AT 0x64 + 0x1E)) "%fx_data%"
-                        WRITE_SHORT (LONG_AT 0x64 + 0x1E) (THIS + 1)
-                      END
-                    BUT_ONLY
-                  END
-                END
-              END
-              DEFAULT
-            END
-          END
-          DEFAULT
-        END
-      END
-    END
+COPY_EXISTING ~%WIZARD_GREAT_SHOUT%.spl~ ~override~ // spwi806 great shout
+  LPF DELETE_EFFECT INT_VAR match_opcode = 174 END
+  LPF DELETE_EFFECT INT_VAR match_opcode = 139 match_target = 2 match_savingthrow = BIT0 END // nuke dupe 'stunned' string
+  LPF CLONE_EFFECT INT_VAR match_opcode =  142 match_duration = 12 opcode = 206 parameter1 = 0 parameter2 = 0 duration = 1 STR_VAR resource = EVAL ~%WIZARD_GREAT_SHOUT%~ insert = below END
+  LPF ADD_SPELL_EFFECT INT_VAR insert_point = 0 opcode = 174 target = 1 power = 8 timing = 1 resist_dispel = 2 STR_VAR resource = ~#ff_m101~ END
   BUT_ONLY
-END
-
-// tbd, cam
-// expiry sound is way too early
-COPY_EXISTING ~spwish33.spl~ ~override~ // Intoxication - causes drunkenness - plays sound EFF_E06 - portrait icon 5
-  LPF ALTER_EFFECT INT_VAR match_opcode = 174 match_duration = 60 duration = 1200 END
-  
-  
 
 // luke
 // 1) Grease should not interact with spell protections
@@ -855,9 +1150,11 @@ WITH_SCOPE BEGIN
                 ~%WIZARD_GREASE%c.spl~ ~override~ // spwi101c
     LPF ~ALTER_EFFECT~ INT_VAR ~power~ = 0 END
     LPF ~ALTER_EFFECT~ INT_VAR ~match_opcode~ = 215 ~opcode~ = 158 END // Play visual effect => Grease overlay
+  // swapping stacking protection from 206/318/324 for 321
+  // see also cwoslim.itm, #cofear.spl, spin132.spl, sppr617.spl, spin161.spl, sppr250.spl, spwi101.spl
+    LPF CLONE_EFFECT INT_VAR match_opcode = 158 opcode = 321 parameter2 = 0 timing = 0 duration = 0 STR_VAR resource = EVAL ~%SOURCE_RES%~ insert = above END
   BUT_ONLY_IF_IT_CHANGES
 END
-
 
 
 // luke
@@ -880,86 +1177,16 @@ WITH_SCOPE BEGIN
   BUT_ONLY_IF_IT_CHANGES
 END
 
-// luke
-// Spirit Fire => should not interact with spell protections
-// As a result, do not use "bddoom.spl" (since its effects are coded as `power=1`)
-WITH_SCOPE BEGIN
-  INCLUDE "eefixpack/files/tph/luke/cleric_spirit_fire.tph" // sppr450.spl, sppr450a.spl, sppr450b.spl
-  LAUNCH_ACTION_FUNCTION "CLERIC_SPIRIT_FIRE" END
-END
-
-
-
-// luke
-// Nature's Beauty – permanent blindness (until dispelled)
-// 1) Timing Mode 1 will permanently set the creature's STATE_BLIND flag, leaving no removable effect.
-// 2) Related: the -4 penalty to AC and THAC0 are apparently tied to the effect (op74), not STATE_BLIND.
-// As a result, we suggest to stick with a limited `timing_mode` and set `duration` to a very high random value (max signed value...?).
-// Additionally, this spell should only affect HUMANOID (there are a lot of unnatural creatures that are immune to it via op206; also, it is intended, right...?)
-WITH_SCOPE BEGIN
-  COPY_EXISTING ~%CLERIC_NATURE_BEAUTY%.spl~ ~override~ // sppr704.spl
-    LPF "ADD_SPELL_EFFECT" INT_VAR "insert_point" = 0 "opcode" = 324 "target" = 2 "power" = 7 "parameter2" = 6 "resist_dispel" = BIT1 STR_VAR "resource" = "%DEST_RES%" END // Immunity to resource and message (GENERAL != HUMANOID)
-    LAUNCH_PATCH_FUNCTION "ALTER_EFFECT" INT_VAR "match_opcode" = 74 "timing" = 0 "duration" = 0x7FFFFFFF END // Blindness
-    LAUNCH_PATCH_FUNCTION "DELETE_EFFECT" INT_VAR "match_opcode" = 142 END // op74 naturally provides the "Blind" portrait icon
-  BUT_ONLY_IF_IT_CHANGES
-END
-
-/*
-luke
-**Sunray**
-- It now properly distinguishes `GENERAL=UNDEAD || RACE=MYCONID` from `!(GENERAL=UNDEAD || RACE=MYCONID)`
-*/
-WITH_SCOPE BEGIN
-  INCLUDE ~eefixpack/files/tph/luke/sunray.tph~ // sppr707.spl, sppr707a.spl, sppr707b.spl, sppr707c.spl
-  LAF ~CLERIC_SUNRAY~ END
-END
-
-/*
-luke
-Summon Nishruu / Hakeashar
-- their attack (`nishrusu.itm`) should ignore all `AC` modifiers
-  - previously, since it was using `damage_type=piercing`, the Nishruu (`THAC0=11`) would need to roll a Critical Hit in order to hit `AC -9 vs. piercing` attacks targets. A similar argument holds for the Hakeashar
-    - this is certainly unintended since they don't actually deal piercing damage
-- they should be vulnerable to Dispel/Remove Magic
-- they should be flagged as `GENERAL=MONSTER` / `RACE=MIST` / `CLASS=MIST` on all games
-- make sure the Nishruu has 100% Poison resistance
-- The Hakeashar should have the same passive traits as the Nishruu
-  - i.e., it should be immune to Poison and see invisible creatures
-- the Nishruu should use the `NISHRUU` animation on all games
-- the Hakeashar should use the `HAKEASHAR` animation on all games
-- removed unused spell setup
-*/
-WITH_SCOPE BEGIN
-  INCLUDE ~eefixpack/files/tph/luke/nishruu_hakeashar.tph~
-  LAF ~NISHRUU_HAKEASHAR~ END
-END
-
 /*
 luke
 **Ghast attack**
 - Effects that grant a Save vs. Paralyze/Poison/Death should go into the new subspell
-- Add missing feedback string
 */
 WITH_SCOPE BEGIN
   COPY_EXISTING "ghast1.spl" "override"
     LPF "DELETE_EFFECT" INT_VAR "check_globals" = 0 "match_savingthrow" = BIT2 END
   BUT_ONLY_IF_IT_CHANGES
-  COPY_EXISTING - "ghast1.itm" "override"
-    GET_OFFSET_ARRAY "ab_array" ITM_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" ITM_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN LONG_AT (0x8 + "%fx_off%") == 111 AND SLONG_AT (0x4 + "%fx_off%") == IDS_OF_SYMBOL ("splstate" "PARALYZE_IMMUNITY") BEGIN
-            READ_ASCII (0x14 + "%fx_off%") "subspell"
-          END
-          DEFAULT
-        END
-      END
-    END
-  BUT_ONLY
-  COPY_EXISTING "%subspell%.spl" "override"
-    LPF "ADD_SPELL_EFFECT" INT_VAR "opcode" = 139 "target" = 2 "timing" = 1 "parameter1" = 14650 "resist_dispel" = 3 END // feedback string
+  COPY_EXISTING "ghast1p.spl" "override"
     LPF "ADD_SPELL_EFFECT" INT_VAR "opcode" = 174 "target" = 2 "timing" = 1 "resist_dispel" = 3 STR_VAR "resource" = "#EFF_P11" END
     LPF "ADD_SPELL_EFFECT" INT_VAR "opcode" = 174 "target" = 2 "timing" = 4 "duration" = 36 "resist_dispel" = 3 STR_VAR "resource" = "#EFF_E05" END
   BUT_ONLY_IF_IT_CHANGES
@@ -1010,255 +1237,57 @@ WITH_SCOPE BEGIN
   END
 END
 
-/*
-luke
-**Sprays Spores**
-- make sure all effects are dispellable / bypass Magic Resistance
-  - this is a "eefixpack\files\tph\luke\7eyes\berserk.tph" follow-up
-*/
+/////                                                  \\\\\
+///// projectile fixes                                 \\\\\
+/////                                                  \\\\\
 
-WITH_SCOPE BEGIN
-  COPY_EXISTING "%INNATE_MYCONID_SPORES%.spl" "override"
-    GET_OFFSET_ARRAY "ab_array" SPL_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" SPL_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN LONG_AT (0x8 + "%fx_off%") == 111 BEGIN
-            PATCH_MATCH SLONG_AT (0x4 + "%fx_off%") WITH
-              IDS_OF_SYMBOL ("splstate" "BERSERK_IMMUNITY") IDS_OF_SYMBOL ("splstate" "STUN_IMMUNITY") IDS_OF_SYMBOL ("splstate" "PANIC_IMMUNITY") BEGIN
-                READ_ASCII (0x14 + "%fx_off%") $"subspell_arr"("%fx_ind%")
-                WRITE_BYTE (0xD + "%fx_off%") BIT0
-              END
-              DEFAULT
-            END
-          END
-          DEFAULT
-        END
-      END
-    END
-  BUT_ONLY_IF_IT_CHANGES
-  ACTION_PHP_EACH "subspell_arr" AS "" => "resref" BEGIN
-    COPY_EXISTING "%resref%.spl" "override"
-      LPF "ALTER_EFFECT" INT_VAR "check_globals" = 0 "resist_dispel" = BIT0 | BIT1 END
-    BUT_ONLY
-  END
-END
+// fixed dragon breath projectiles
+COPY_EXISTING ~dragblck.pro~ ~override~
+              ~draggree.pro~ ~override~
+              ~dragred.pro~  ~override~
+              ~dragsilv.pro~ ~override~
+  WRITE_SHORT 0x210 8
 
-/*
-luke
-**Mental Domination**
-- should also block innate abilities (as per spell description)
-*/
-
-WITH_SCOPE BEGIN
-  COPY_EXISTING "%CLERIC_MENTAL_DOMINATION%.spl" "override"
-    LPF "CLONE_EFFECT" INT_VAR "multi_match" = 1 "match_opcode" = 60 "parameter1" = 100 "parameter2" = 2 END // Casting failure
-  BUT_ONLY
-END
-
-/*
-luke
-**Talon of the Gloomfrost +4, Holdfast Arrow +1**
-- Should display the Entangled icon instead of the Held icon
-- Should display the "Entangled" string
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "holdfst.itm" "override"
-                "talongf.itm" "override"
-    GET_OFFSET_ARRAY "ab_array" ITM_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" ITM_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN SLONG_AT (0x4 + "%fx_off%") == IDS_OF_SYMBOL ("splstate" "ENTANGLE_IMMUNITY") AND LONG_AT (0x8 + "%fx_off%") == 111 BEGIN
-            READ_ASCII (0x14 + "%fx_off%") "subspell"
-          END
-          DEFAULT
-        END
-      END
-    END
-    INNER_ACTION BEGIN
-      COPY_EXISTING "%subspell%.spl" "override"
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 142 "parameter1" = 0 "parameter2" = 144 "special" = 0 STR_VAR "insert" = "below" "resource" = "" END
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 139 "parameter1" = 37709 "parameter2" = 0 "special" = 0 "timing" = 1 "duration" = 0 STR_VAR "insert" = "below" "resource" = "" END
-      BUT_ONLY
-    END
-  BUT_ONLY
-END
-
-/*
-luke
-**(unused, but fix anyway)**
-- Should display the Entangled icon instead of the Held icon
-- Should display the "Entangled" string
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "holdfst.spl" "override"
-                "talongf.spl" "override"
-    LPF "DELETE_EFFECT" INT_VAR "match_opcode" = 142 "match_parameter2" = 13 END
-    LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 142 "parameter1" = 0 "parameter2" = 144 "special" = 0 STR_VAR "insert" = "below" "resource" = "" END
-    LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 139 "parameter1" = 37709 "parameter2" = 0 "special" = 0 "timing" = 1 "duration" = 0 STR_VAR "insert" = "below" "resource" = "" END
-  BUT_ONLY
-END
-
-/*
-luke
-**Club (unused, but fix anyway)**
-- Add missing ancillary effects (it currently only displays the entangle overlay, but does not actually cause Entangle!)
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "gasp.itm" "override"
-    GET_OFFSET_ARRAY "ab_array" ITM_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" ITM_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN SLONG_AT (0x4 + "%fx_off%") == IDS_OF_SYMBOL ("splstate" "entangle_immunity") AND LONG_AT (0x8 + "%fx_off%") == 111 BEGIN
-            READ_ASCII (0x14 + "%fx_off%") "subspell"
-          END
-          DEFAULT
-        END
-      END
-    END
-    INNER_ACTION BEGIN
-      COPY_EXISTING "%subspell%.spl" "override"
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 142 "parameter1" = 0 "parameter2" = 144 "special" = 0 STR_VAR "insert" = "last" "resource" = "" END
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 139 "parameter1" = 37709 "parameter2" = 0 "special" = 0 "timing" = 1 "duration" = 0 STR_VAR "insert" = "last" "resource" = "" END
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 126 "parameter1" = 0 "parameter2" = 5 "special" = 0 STR_VAR "insert" = "last" "resource" = "" END
-      BUT_ONLY
-    END
-  BUT_ONLY
-END
-
-/*
-luke
-**(unused, but fix anyway)**
-- Add missing ancillary effects (it currently only displays the entangle overlay, but does not actually cause Entangle!)
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "gasp.spl" "override"
-    GET_OFFSET_ARRAY "ab_array" SPL_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" SPL_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN SLONG_AT (0x4 + "%fx_off%") == IDS_OF_SYMBOL ("splstate" "entangle_immunity") AND LONG_AT (0x8 + "%fx_off%") == 111 BEGIN
-            READ_ASCII (0x14 + "%fx_off%") "subspell"
-          END
-          DEFAULT
-        END
-      END
-    END
-    INNER_ACTION BEGIN
-      COPY_EXISTING "%subspell%.spl" "override"
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 142 "parameter1" = 0 "parameter2" = 144 "special" = 0 STR_VAR "insert" = "last" "resource" = "" END
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 139 "parameter1" = 37709 "parameter2" = 0 "special" = 0 "timing" = 1 "duration" = 0 STR_VAR "insert" = "last" "resource" = "" END
-        LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 154 "opcode" = 126 "parameter1" = 0 "parameter2" = 5 "special" = 0 STR_VAR "insert" = "last" "resource" = "" END
-      BUT_ONLY
-    END
-  BUT_ONLY
-END
-
-/*
-luke
-**Warrior Cry, Fear, Aura of Fear, Spook, Emotion:Fear, Symbol:Fear**
-- op324 resource field should not be blank
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "%WARRIOR_WAR_CRY%.spl" "override"
-                "%INNATE_BEHOLDER_FEAR%.spl" "override"
-                "%INNATE_AURA_OF_FEAR%.spl" "override"
-                "%WIZARD_SPOOK%.spl" "override"
-                "%WIZARD_EMOTION_FEAR%.spl" "override"
-                "spwm123.spl" "override" // Symbol, Fear
-    LPF "ALTER_EFFECT" INT_VAR "match_opcode" = 324 "match_parameter2" = 55 STR_VAR "match_resource" = "" "resource" = "%DEST_RES%" END
-  BUT_ONLY
-END
-
-/*
-luke
-**Cornugon**
-- "eefixpack\files\tph\luke\7eyes\7eyes.tph" follow-up
-*/
-WITH_SCOPE BEGIN
-  COPY_EXISTING "sflail.itm" "override"
-    GET_OFFSET_ARRAY "ab_array" ITM_V10_HEADERS
-    PHP_EACH "ab_array" AS "ab_ind" => "ab_off" BEGIN
-      GET_OFFSET_ARRAY2 "fx_array" "%ab_off%" ITM_V10_HEAD_EFFECTS
-      PHP_EACH "fx_array" AS "fx_ind" => "fx_off" BEGIN
-        PATCH_MATCH SHORT_AT "%fx_off%" WITH
-          326 WHEN SLONG_AT (0x4 + "%fx_off%") == IDS_OF_SYMBOL ("splstate" "stun_immunity") AND LONG_AT (0x8 + "%fx_off%") == 111 BEGIN
-            READ_ASCII (0x14 + "%fx_off%") "subspell"
-          END
-          12 139 BEGIN
-            READ_ASCII "%fx_off%" $"tosubspell"("%fx_ind%") (0x30)
-            WRITE_SHORT "%fx_off%" 999
-          END
-          DEFAULT
-        END
-      END
-      LPF "DELETE_EFFECT" INT_VAR "check_globals" = 0 "header" = "%ab_ind%" "match_opcode" = 999 END
-      LPF "CLONE_EFFECT" INT_VAR "check_globals" = 0 "header" = "%ab_ind%" "match_opcode" = 326 "opcode" = 146 "parameter1" = 0 "parameter2" = 1 "probability1" = 50 "probability2" = 0 STR_VAR "resource" = "sflail01" END
-    END
-  BUT_ONLY
-  //
-  COPY_EXISTING "%subspell%.spl" "override"
-    LPF "DELETE_SPELL_EFFECT" INT_VAR "opcode_to_delete" = 8 END
-    LPF "CLONE_EFFECT" INT_VAR "match_opcode" = 45 "opcode" = 8 "parameter1" = (46 << 8) + (56 << 16) + (0 << 24) "parameter2" = 255 STR_VAR "insert" = "last" END // Set color glow solid (Location: Character color)
-  BUT_ONLY
-  //
-  COPY_EXISTING "%subspell%.spl" "override\sflail01.spl"
-    LPF "DELETE_EFFECT" END
-    PHP_EACH "tosubspell" AS "" => "fx_data" BEGIN
-      INNER_PATCH "%fx_data%" BEGIN
-        READ_SHORT 0x0 "op"
-        PATCH_IF ("%op%" == 0xC) BEGIN
-          TEXT_SPRINT "insert" "first"
-        END ELSE BEGIN
-          TEXT_SPRINT "insert" "last"
-        END
-      END
-      PATCH_MATCH "%insert%" WITH
-        "first" BEGIN
-          SET "offset" = LONG_AT 0x6A
-        END
-        DEFAULT
-          SET "offset" = LONG_AT 0x6A + 0x30 * SHORT_AT (LONG_AT 0x64 + 0x1E)
-      END
-      INSERT_BYTES "%offset%" 0x30
-      WRITE_ASCII "%offset%" "%fx_data%"
-      WRITE_BYTE ("%offset%" + 0x12) 100 // prob1
-      WRITE_BYTE ("%offset%" + 0x13) 0 // prob2
-      WRITE_SHORT (LONG_AT 0x64 + 0x1E) (THIS + 1) // # effects
-    END
-  BUT_ONLY
-END
-
-/*
-luke
-**Searing Orb** // (unused, but fix anyway)
-- "eefixpack\files\tph\luke\7eyes\7eyes.tph" follow-up
-*/
-WITH_SCOPE BEGIN
-  INCLUDE "eefixpack\files\tph\luke\searing_orb.tph"
-  LAF "CLERIC_SOL_SEARING_ORB" END
-END
+// fixing grease projectile to fire once/round instead of twice/round
+COPY_EXISTING ~idpro101.pro~ ~override~
+  WRITE_SHORT 0x210 100
+  WRITE_BYTE  0x216 10
+  
+// make protection from evil 10' radius actually, uh, have a 10' radius  
+COPY_EXISTING ~idpro258.pro~ ~override~ // adjust to 10' projectile 
+  WRITE_SHORT 0x204 171 
+  WRITE_SHORT 0x206 171
 
 // tbd, cam
-// don't play berserk damage warnings on non-party memebers; see also spin117[ab].eff
-INCLUDE ~eefixpack/files/tph/tbd_angry_noises.tph~
+// broken sound reference in lance of disruption projectile
+COPY_EXISTING ~idpro313.pro~ ~override~
+  WRITE_ASCII 0x18 ~#tra_59~ #8
 
 /////                                                  \\\\\
 ///// store fixes                                      \\\\\
 /////                                                  \\\\\
 
+// crieg's bag of holding has several items with charge issues
+COPY_EXISTING ~bagh02.sto~ ~override~
+  LPF alter_store_item INT_VAR charge2 = 0 charge3 = 0 STR_VAR match_item = wand02 END
+  LPF alter_store_item INT_VAR charge1 = 1 stock = 4 STR_VAR match_item = adisease END
+  LPF alter_store_item INT_VAR charge1 = 1 stock = 2 STR_VAR match_item = philter END
+  LPF alter_store_item INT_VAR charge1 = 1 stock = 4 STR_VAR match_item = flamoil END
+  BUT_ONLY
+
 /////                                                  \\\\\
 ///// misc/other fixes                                 \\\\\
 /////                                                  \\\\\
-            
+
+// illusionary creatures shouldn't save when dispelled
+INCLUDE ~eefixpack/files/tph/illusionary_die.tph~
+
+// Fix reference to non-existing ACM sound resource
+COPY ~music/bm2.mus~ ~music/bm2.mus~
+  REPLACE_TEXTUALLY ~^N2\b~ ~N1~ UNLESS ~^N1\b~
+
 // ie-6008, cam
-// Worldmap travel fixes
+// Worldmap travel fixes, https://www.gibberlings3.net/forums/topic/36416-iwd-worldmap/
 COPY_EXISTING ~worldmap.wmp~ ~override~ // inconsistent travel times
   READ_LONG 0x0c mos_off
   READ_LONG (mos_off + 0x20) area_num
@@ -1266,11 +1295,17 @@ COPY_EXISTING ~worldmap.wmp~ ~override~ // inconsistent travel times
   READ_LONG (mos_off + 0x28) link_off
   FOR (index = 0 ; index < area_num ; ++index) BEGIN
     READ_ASCII (area_off + 0x08 + (index * 0xf0)) area
+    PATCH_IF ("%area%" STRING_COMPARE_CASE "ar2100" = 0) BEGIN // kuldahar
+      SET kuld = index
+    END ELSE
     PATCH_IF ("%area%" STRING_COMPARE_CASE "ar5000" = 0) BEGIN // severed hand
       SET hand = index
     END ELSE
     PATCH_IF ("%area%" STRING_COMPARE_CASE "ar4000" = 0) BEGIN // dragon's eye
       SET deye = index
+    END ELSE
+    PATCH_IF ("%area%" STRING_COMPARE_CASE "ar6000" = 0) BEGIN // dorn's deep
+      SET dorn = index
     END ELSE
     PATCH_IF ("%area%" STRING_COMPARE_CASE "ar7000" = 0) BEGIN // wyrm's tooth
       SET wyrm = index
@@ -1282,30 +1317,53 @@ COPY_EXISTING ~worldmap.wmp~ ~override~ // inconsistent travel times
       READ_LONG (area_off + 0x54 + (index2 * 0x08) + (index * 0xf0)) link_num
       FOR (index3 = 0 ; index3 < link_num ; ++index3) BEGIN // loop through actual links
         READ_LONG (link_off +        ((link_idx + index3) * 0xd8)) target
-        PATCH_IF ((index = deye) AND (target = hand)) BEGIN // dragon's eye to severed hand
+        PATCH_IF (((index = deye) AND (target = hand)) OR
+                  ((index = hand) AND (target = deye))) BEGIN // dragon's eye <> severed hand
           WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 12 // travel time
-        END ELSE  
-        PATCH_IF ((index = wyrm) AND (target = hand)) BEGIN // wyrm's tooth to severed hand
-          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 72 // travel time
-        END   
+        END ELSE
+        PATCH_IF (((index = wyrm) AND (target = hand)) OR
+                  ((index = hand) AND (target = wyrm))) BEGIN // wyrm's tooth <> severed hand
+          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 18 // travel time
+        END ELSE
+        PATCH_IF (((index = deye) AND (target = dorn)) OR
+                  ((index = dorn) AND (target = deye))) BEGIN // dorn's deep <> severed hand
+          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 12 // travel time
+        END ELSE
+        PATCH_IF (((index = kuld) AND (target = hand)) OR
+                  ((index = hand) AND (target = kuld))) BEGIN // kuldahar <> severed hand
+          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 20 // travel time
+        END ELSE
+        PATCH_IF (((index = wyrm) AND (target = kuld)) OR
+                  ((index = kuld) AND (target = wyrm))) BEGIN // wyrm's tooth <> kuldahar
+          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 24 // travel time
+        END ELSE
+        PATCH_IF (((index = deye) AND (target = kuld)) OR
+                  ((index = kuld) AND (target = deye))) BEGIN // dragon's eye <> kuldahar
+          WRITE_LONG (link_off + 0x24 + ((link_idx + index3) * 0xd8)) 18 // travel time
+        END
       END
     END
   END
   BUT_ONLY
 
-
-
-// tbd, cam
-// broken sound reference in lance of disruption projectile
-COPY_EXISTING ~idpro313.pro~ ~override~
-  WRITE_ASCII 0x18 ~#tra_59~ #8
-
 /////                                                  \\\\\
 ///// final batch of INCLUDEs and cross-patching       \\\\\
 /////                                                  \\\\\
 
+// prevent spell called via op232 from interrupting caster sounds
+INCLUDE ~eefixpack/files/tph/noisy_fireshields.tph~
+
 INCLUDE ~eefixpack/files/tph/6037_iwdee_probabilities.tph~ // ie-6021 & ie-6037, cam: probability fixes
 INCLUDE "%MOD_FOLDER%/files/tph/dw_fixes.tph" // tbd, davidw:  318/324 immunity, 109/175/185 disentanglement, and more
+
+// fixes the hot mess of three white doves
+// death moved back below death messages; fixing HD targeting for undead destruction
+COPY_EXISTING ~doves.itm~   ~override~ // three white doves
+  LPF CLONE_EFFECT INT_VAR                   match_opcode = 177 STR_VAR match_resource = cddovdie insert = last END // copy die to last effects after messages
+  LPF DELETE_EFFECT INT_VAR multi_match = 18 match_opcode = 177 STR_VAR match_resource = cddovdie               END // yes, 18
+  PATCH_FOR_EACH lev IN 5 6 7 8 10 11 BEGIN
+    LPF ALTER_EFFECT INT_VAR match_opcode = 177 match_parameter1 = 4 match_parameter2 = 3 match_dicesize = lev dicesize = 0 END
+  END
 
 WITH_SCOPE BEGIN
   INCLUDE "eefixpack/files/tph/luke/redundant_effects.tph"

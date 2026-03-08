@@ -824,12 +824,13 @@ Requires:
 Weight: 3~
 
 // [automatic scan] Issues: 2  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 6
+// adding (missile) to damage line
 @7350 = ~This bow is enchanted to enhance its damage and boost the user's aim.
 
 STATISTICS:
 
 THAC0: +3
-Damage: +2
+Damage: +2 (missile)
 Speed Factor: 5
 Proficiency Type: Longbow
 Type: Two-handed
@@ -1455,6 +1456,21 @@ The wall of fire spell brings forth an immobile, blazing curtain of magical fire
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @12343 = ~Innkeeper~
 
+// history of shadowdale titles lack chapter references (all just "History of Shadowdale")
+@13094 = ~History of Shadowdale I~
+@13095 = ~History of Shadowdale II~
+@13096 = ~History of Shadowdale III~
+@13097 = ~History of Shadowdale IV~
+@13098 = ~History of Shadowdale V~
+@13099 = ~History of Shadowdale VI~
+@13100 = ~History of Shadowdale VII~
+@13101 = ~History of Shadowdale VIII~
+@13102 = ~History of Shadowdale IX~
+@13103 = ~History of Shadowdale X~
+@13104 = ~History of Shadowdale XI~
+@13105 = ~History of Shadowdale XII~
+@13106 = ~History of Shadowdale XIII~
+
 // [automatic scan] Issues: 9  | Surplus trailing whitespace at line 1 | Surplus trailing whitespace at line 3 | Surplus trailing whitespace at line 5 | Surplus trailing whitespace at line 7 | Surplus trailing whitespace at line 9 | Surplus trailing whitespace at line 11 | Surplus trailing whitespace at line 13 | Surplus trailing whitespace at line 15 | Surplus trailing line break at line 17
 @13136 = ~History of Amn:
 
@@ -1693,6 +1709,40 @@ Nesme reported a drastic rise in the number of troll attacks in the Evermoors, a
 
 In the most surprising move of the year, the Blue Bear Tribe, led by the shaman/chieftain Tanta Hagara, marched on the fiend-ridden fortress of Hellgate Keep. While a brief struggle for political control of the city was reported by various sources, Tanta Hagara emerged as the new ruler of the city.~
 
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@13177 = ~History of the North—1369, Year of the Gauntlet:
+
+The tumultuous climate of Hellgate Keep continued to provide adventuring activity. A group of Harpers infiltrated the city using cloaking magic and revealed that Tanta Hagara was actually an annis. This revelation did nothing to hamper the Blue Bear's respect for their powerful chieftain however, and the city responded to the unmasking by attacking caravans en route to Sundabar. In addition, a few expeditionary forces of tanar'ri were sent to harass the Citadel of the Mists, Sundabar, and Silverymoon. Tanta Hagara informed her "loyal troops" that gates existed in these cities that could allow other tanar'ri to "join us in the glorious battles to come as we take control of all of the North!"
+
+Alustriel cast powerful magical spells in the defense of Silverymoon against the raiding tanar'ri, and the city itself suffered no damage from their attack. The Mistmaster of the Citadel of the Mists likewise aided in the defense of his citadel, though reports still rage about the assistance of the treants of the High Forest.
+
+Sundabar suffered from Hellgate Keep's attack, as the fiends broke through the walls and raised havoc along the city streets. While adventurers battled the fiends, Helm Dwarffriend led a large contingent of the city guard to drive the remainder from Sundabar. Still, the fiends from Hellgate Keep left the city with the satisfaction of knowing that it was burning in their wake. Within two days, however, the fires were extinguished, and Sundabar has since rebuilt from the attack.
+
+By mid Eleasias, rumors that Turlang, the powerful treant who resides in the northern High Forest, was actively defending the woodlands near the Citadel of the Mists reached the ears of Tanta Hagara, the hag-ruler of Hellgate Keep. News that Turlang was aiding the Mistmaster did not escape her notice, and the belief that the Citadel of the Mists was holding an extraplanar artifact only added to the hag's interest.
+
+Tanta assembled a large force consisting of more than 100 tanar'ri and other fiends as well as 500 members of the Blue Bear tribe to raze the Citadel of the Mists. But as the evil forces marched their way into the High Forest, the Mistmaster put his own plan into motion. Two Harper agents, a bard named Cryshana Fireglen and a priest of Mystra known as Spellviper, infiltrated Hellgate Keep disguised as members of the Blue Bear tribe. Each carried with them part of an extraplanar artifact called the Gatekeeper's Crystal.
+
+The Gatekeeper's Crystal is an artifact shaped like a three-pointed star that is made of onyx and an unknown metal that entwines itself through the gem. Each point of the star is a separate piece that can be combined together to create the artifact or separated to form three powerful magical items. While the crystal can be used in different manners, it was primarily created to bring down wards, including mythals and other powerful protections. According to legend, it was created by a powerful lich who used it to render clerics powerless, stripping them of their ability to turn undead and nullifying necromantic magic within a 50-mile radius.
+
+The Mistmaster had a different use for the Gatekeeper's Crystal, but he needed volunteers to aid him in placing two shards of the crystal at precise locations within the warded city of Hellgate Keep. In particular, he needed two people who would be willing to trade their lives to exterminate the fiends of Hellgate Keep forever. Spellviper and Cryshana agreed to the suicide mission. Holding the pieces of the crystal, the two Harpers waited for the Mistmaster to activate the magic with his third piece, initiating the magic that would tear Hellgate Keep asunder. When a blazing beam of purple energy illuminated the skies over the keep, no one within the fiend's stronghold had time to wonder what was happening.
+
+The power of the Gatekeeper's Crystal forced the wards to cascade upon the city, causing an implosion that shook the ground for more than 100 miles. As quickly as the wards surrounding Hellgate Keep collapsed, the crystal released the magical energy in an explosion that leveled every building in the city, leaving nothing but fist-sized chunks of rocks where Hellgate Keep once stood. Not a living creature stirred in the remains; all was silent and lifeless.
+
+The force of tanar'ri from Hellgate Keep was unsure what had happened but had felt the tremor when the Gatekeeper's Crystal had been activated. They were fighting for their own lives, however, as the treants, korred, centaurs, satyrs, dryads, and other creatures of the High Forest—including defenders of the Citadel of the Mists—battered them into the moist earth. One of the North's most notable rulers fell in the battle, however, but he took at least six tanar'ri with him to his grave. Faurael Blackhammer, the lord protector of Triboar, fell alongside his troops near the conclusion of the conflict.
+
+Within weeks after the final battle with Hellgate Keep, treants blocked passage farther north at the joining of the Heart-blood and Delimbiyr rivers. While the treants care little for hunters and adventurers passing through the area, all caravans seeking passage north to Sundabar have been repulsed—and this is not a matter that the treants wish to negotiate.
+
+In another mishap blamed on Turlang, Tumstone Pass was blocked by a tremendous avalanche. This final calamity sealed the Upvale from any major force of men. Travel into the area formerly occupied by Hellgate Keep is now limited to adventurers and other brave travelers.
+
+The Mistmaster has been questioned repeatedly by some of the most powerful wizards in the realms, including Elminster of Shadowdale and Khelben Arunsun, about the current location of the Gatekeeper's Crystal. Most sources claim that the pieces of the crystal have been scattered amongst the planes again, but no one is certain.
+
+Near Nesme, the source of the trolls' exodus is revealed. Fog and cloud giants have taken up residence in the moor, driving the trolls from the giants' new "homeland." While it's unknown how many giants have taken up residence in the High Moor, estimates range up to several hundred. A thick mist continually hangs in the air of the Evermoors now, even more persistent and thick than the mist before the giants' arrival. Many believe that these new mists are the work of the cloud giants, but none can be certain.
+
+Alustriel of Silverymoon sent a detachment of guards to investigate the eastern borders of the moor, and the guards returned with news that a gathering of around 20 fog giants who were "of good nature and quite friendly" had taken up residence in a formerly troll-infested area.
+
+Guards from neighboring Nesme were not so fortunate, however, running into a clan of violent, boulder-hurling fog and cloud giants who nearly decimated their unit. In addition, a group of adventurers crawled into Nesme with terrible burns, reporting that they had run into a black dragon at a fog giant encampment. Overall, it appears that both good and evil giants now call the moor their home.~
+
 // [automatic scan] Issues: 2  | Surplus trailing whitespace at line 1 | Surplus trailing line break at line 3
 @13178 = ~History of the North—Return of the Beast (1367—?):
 
@@ -1778,6 +1828,20 @@ Ahghairon's health eventually failed and he died. He was buried with ceremony in
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @13754 = ~This strange device~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@14135 = ~Gate
+(Conjuration/Summoning)
+
+Level: 7
+Sphere: Summoning
+Range: 60 ft.
+Duration: 33 rounds
+Casting Time: 5
+Area of Effect: Special
+Saving Throw: None
+
+By means of this spell, the caster calls an outerplanar creature (currently invisible stalker) to attack <PRO_HISHER> foes—and <PRO_HIMHER>self, if not careful.~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @14228 = ~This uniquely made bastard sword is imbued with an ever-present supply of acidic venom. While not poisonous, the venom will burn if it contacts flesh.
@@ -2011,9 +2075,6 @@ Proficiency Type: Dart
 Type: One-handed
 
 Weight: 0~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@14643 = ~Attack Roll~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @14695 = ~Potions are typically found in ceramic, crystal, glass, or metal flasks or vials. Flasks or other containers generally contain enough fluid to provide one person with one complete dose to achieve the effects of the potion.
@@ -2585,12 +2646,6 @@ Proficiency Type:
 Weight: 0~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@16466 = ~Turn Undead Mode~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@16468 = ~Find Trap Mode~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @16575 = ~Press the Gender button to begin creating your character, or press Cancel to return to the previous page.
 
 If you wish to import a premade character, then use the Import option to select one of the different characters which have already been created for you.~
@@ -2612,6 +2667,17 @@ Weight: 4~
 'My companions and I travel this day to search out the wolf lair. My own scouting of the region has confirmed Merella's suspicions that there is a large pack of wolves acting in this area. On the map included I have indicated where I believe the wolf den to be located. Follow us if you can, but be cautious. We can ill afford another mysterious disappearance. With strong sword and wary mind I do hope to find dear Merella. Until we meet again.
 
 '''Mazzy.~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@17235 = ~A typical tome of clear thought contains a collection of esoteric and scholarly literature, often involving obscure mathematical or algebraic formulae or the occasional reference to interplanar biology. Such tomes are usually magically enhanced, thereby allowing an individual to raise his or her Intelligence by a single point. Unfortunately, the manual will disappear after a single use.
+
+STATISTICS:
+
+Intelligence: Raised by 1 point permanently
+Special: The book is consumed upon use
+Usage: Place into Quick Item slot
+
+Weight: 25~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @17243 = ~The fabled Nymph Cloak is renowned for its ability to increase the Charisma of even the most surly dwarf. A Cormyrean noble hoping to make her politically convenient marriage more palatable apparently went to great expense to obtain one for herself and another for her husband.
@@ -2649,6 +2715,19 @@ Requires:
  4 Strength
 
 Weight: 3~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@17352 = ~Gate
+(Conjuration/Summoning)
+
+Level: 9
+Range: Visual range of the caster
+Duration: 33 rounds
+Casting Time: 9
+Area of Effect: Special
+Saving Throw: None
+
+By means of this spell, the caster calls an outerplanar creature to attack <PRO_HISHER> foes—and <PRO_HIMHER>self if he's not careful.~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 9
 @17533 = ~This cursed item was created by the wicked sorcerer Valom of the Deep. Valom often hired lone mercenaries to collect magic item components for him. When the unlucky sellswords came on board Valom's floating laboratory, the Dim Courser, Valom would give them the girdle as a reward for a job well done. Once the victim would try on the girdle, Valom would kick them over the side of the boat, where they would quickly drown. Valom's luck ran out when he kicked Herred of Procampur into the Sea of Fallen Stars. Herred had a potion of water breathing and a helm of underwater action with him at the time. When the huge, seaweed-covered form of Herred emerged near the docks where Valom was resting, a local priest of Tyr immediately came to his aid. Upon discovering what Valom had done, the priest of Tyr and three paladins attempted to capture him. Valom killed two of the paladins, but died in the battle. It is believed that the belt was later sold to a traveling collector who specialized in cursed clothing.
@@ -3102,9 +3181,6 @@ Seeing as you have seen fit to "volunteer" to outfit our expedition to Kuldahar,
 – Hrothgar~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
-@20715 = ~Please insert the Icewind Dale CD~
-
-// [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @20885 = ~Silver Dagger: Werebane:
 This dagger acts as a +4 dagger vs. lycanthropes. Dynala Goldenhand, an elven ranger who wished to rid her homeland of its werejackal problem, forged the dagger. She was killed by a tribe of orcs in the Greypeak Mountains as she tracked the werejackal leader.
 
@@ -3165,6 +3241,36 @@ Requires:
  11 Strength
 
 Weight: 3~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@21625 = ~An extremely unusual mace, Three White Doves was created by an Ilmatari priest named Alledec in 850 DR. Alledec had been a fighting priest for the order for twenty years, and he decided it was time to leave a legacy for the church to use after he had passed away. This ivory-headed mace was the result. The shaft of the weapon is made from black-enameled steel, with the handle being crafted of carved ivory. Gold bands lock the head and the handle into place. The head itself is the most unusual part of the mace. It is carved from pure ivory, and it resembles three white doves facing the center of the weapon. The flared wings of the doves form the flanges.
+
+Alledec died in his sleep three years after completing the mace. It was given to a traveling fighter in service of the church of Ilmater. The fighter later passed the weapon on to a priest of Ilmater named Recken the Bold. Recken lost the weapon when he was fighting a powerful vampire near Trollbark Forest. Recken was eventually victorious over the vampire, but he never recovered the mace.
+
+STATISTICS:
+
+Combat abilities:
+– Double damage against undead and outerplanar creatures.
+  Undead:
+    1-4 Hit Dice: Automatically destroyed
+    5 Hit Dice: 95% chance of being destroyed
+    6 Hit Dice: 80%
+    7 Hit Dice: 65%
+    8-9 Hit Dice: 50%
+    10 Hit Dice: 35%
+    11+ Hit Dice: 20%
+  Outerplanar creatures:
+    5% chance of being destroyed
+
+THAC0: +3
+Damage: 1d6+4 (crushing)
+Speed Factor: 4
+Proficiency Type: Mace
+Type: One-handed
+Requires:
+ 10 Strength
+
+Weight: 5~
 
 // [automatic scan] Issues: 1  | Surplus trailing line break at line 2
 @22238 = ~Moved ne'er by rage and ne'er by anger,
@@ -3316,6 +3422,39 @@ Notes to myself: Should probably be supplemented with something of nutritional v
 
 // [automatic scan] Issues: 1  | Surplus leading whitespace at line 1
 @24118 = ~'Tis a pity, really. Don't be too hard on him, though. He's a good man... in all the ways that matter.~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@24191 = ~Rods of smiting are extremely uncommon weapons, though they can be very useful against some foes. This particular rod was last in the possession of a priest of Gond named Debian of Urmlaspyr. Debian was an eccentric adventurer who took it upon himself to investigate every type of golem that had been reported in the realms. In many cases, the creator of the golem would send his or her creations after Debian for his snooping. Debian usually escaped without much personal harm. Unfortunately for Debian, his luck ran out when he investigated the lair of the Machinery Man, a bizarre lich who happened to be a creator of golems and other animated constructs. The Machinery Man's lab full of iron golems proved to be too much for Debian to overcome.
+
+STATISTICS:
+
+Combat abilities:
+– Against golems, it does an extra 1d8+3 points of crushing damage, with a 5% chance to destroy them
+– Against outerplanar creatures, there is a 5% chance that it will do an extra 8d3 points of crushing damage on a successful hit
+
+THAC0: +3
+Damage: 1d8+3 (crushing)
+Speed Factor: 2
+Proficiency Type: Club
+Type: One-handed
+Requires:
+ 5 Strength
+
+Weight: 2~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@24254 = ~Star Metal Cudgel
+(Conjuration)
+
+Level: 4
+Sphere: Combat
+Range: 0
+Duration: 3 turns
+Casting Time: 7
+Area of Effect: The caster
+Saving Throw: None
+
+This spell creates a meteoric iron magical club that deals 1d6+2 points of crushing damage, confers a +2 bonus to attack rolls, and is treated as a +4 weapon for purposes of what it can hit. Strength, proficiency, and specialization bonuses and penalties apply normally. The club deals an additional 2d6 points of crushing damage against unnatural creatures (undead, elementals, golems, outerplanar creatures, etc.).~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @24313 = ~Eron the Dismayed was a pessimistic wizard with a propensity for magical dueling. He believed that the only way to become strong in the Art was to test his powers against other wizards. However, he also believed that thieves and assassins were constantly looking to steal his wealth. To make himself appear mundane, he wore the clothes of a pilgrim and carried a simple elm walking staff. In reality, the staff was magically enchanted to be more potent in combat, but Eron didn't want to risk advertising that fact.
@@ -3571,12 +3710,13 @@ From what I can garner from this, five gems are needed to activate the device. E
 Now, this all seems rather straightforward, and that is exactly what worries me. It is not the Master's way to be so forthcoming with information. It is my belief that the gems, whatever they may be, must be changed somehow. That would explain the line about the seasons. I must think about this some more..."~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
+// from the main fixes component: add duration of stun to the 'combat abilities' section, not just the flavor description
 @27035 = ~This fine weapon once belonged to the Minotaur Lord in the Luremaster's catacombs. The axe sports a double blade mounted on a solid oak shaft. It is finely balanced and may be used one-handed. The axe is enchanted, giving the user a +4 to both hit and damage. A successful hit also has a 25% chance of stunning an opponent for 1d4 rounds.
 
 STATISTICS:
 
 Combat abilities:
-– 25% chance target is stunned
+– 25% chance target is stunned for 1d4 rounds
 
 THAC0: +4
 Damage: 1d12+4 (slashing)
@@ -4158,6 +4298,19 @@ Duration: 2 hours
 
 Weight: 1~
 
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@35839 = ~Gate
+(Conjuration/Summoning)
+
+Level: 9
+Range: 30 ft.
+Duration: 33 rounds
+Casting Time: 9
+Area of Effect: Special
+Saving Throw: None
+
+By means of this spell, the caster calls an outerplanar creature, the pit fiend, to attack <PRO_HISHER> foes—as well as <PRO_HIMHER>self, if <PRO_HESHE>'s not careful. The caster must use a Protection From Evil spell on <PRO_HIMHER>self (and comrades) to keep the devil from noticing <PRO_HIMHER>. If the caster fails to protect <PRO_HIMHER>self in this manner, the pit fiend will tear the caster and <PRO_HISHER> companions apart piece by piece, then feast on the remains.~
+
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @35914 = ~Long Sword~
 
@@ -4201,6 +4354,20 @@ Requires:
 
 Weight: 1~
 
+// unused protection form evil 10' descript, updating to 10' radius from 15'
+@36007 = ~Protection From Evil, 10' Radius
+(Abjuration)
+
+Level: 4
+Sphere: Protection
+Range: Touch
+Duration: 1 turn/level
+Casting Time: 7
+Area of Effect: 10-ft. radius
+Saving Throw: None
+
+When this spell is cast, all creatures within a 10-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
+
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 3
 @36093 = ~Set Time Trap
 
@@ -4238,6 +4405,20 @@ Special Abilities:
 – Lesser Aura of Flame: All creatures within 5 ft. take 1d2 points of fire damage
 
 The Druid is healed 12 Hit Points after using this ability.~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@36382 = ~Gate
+(Conjuration/Summoning)
+
+Level: 7
+Sphere: Summoning
+Range: 30 ft.
+Duration: 33 rounds
+Casting Time: 5
+Area of Effect: Special
+Saving Throw: None
+
+By means of this spell, the caster calls an outerplanar creature, the pit fiend, to attack <PRO_HISHER> foes—as well as <PRO_HIMHER>self if <PRO_HESHE>'s not careful. The caster must use a Protection From Evil spell on <PRO_HIMHER>self (and comrades) to keep the devil from noticing <PRO_HIMHER>. If the caster fails to protect <PRO_HIMHER>self in this manner, the pit fiend will tear the caster and <PRO_HISHER> companions apart piece by piece, then feast on the remains. Gate can only be cast by evil-aligned characters.~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 11
 @36427 = ~Aura of Flaming Death
@@ -5352,6 +5533,35 @@ Requires:
 
 Weight: 3~
 
+// standardizing 'fireshield' to fireshield (blue), fireshield (red) or just fireshield
+@39633 = ~This staff bears an ancient rune that may link it to the wizards of faraway Halruaa, but it is impossible to be certain. Drawing from the Plane of Fire, it can erupt in a Fireshield that damages attackers, it can summon a Fire Elemental under the control of the wielder, and it can potentially draw all the energy from any fire elemental that it hits, destroying them instantly. Some abilities are limited with charges however.
+
+STATISTICS:
+
+Combat abilities:
+– Struck fire elementals must save vs. Spell or be destroyed
+
+Charge abilities:
+– Summon 8-HD Lesser Fire Elemental
+  Range: 20 ft.
+  Duration: 1 hour
+
+– Fireshield (Red)
+  Fire Resistance: +50%
+  Special: Any who strike the user within a 5-ft. radius suffers 1d8+2 fire damage
+  Duration: 13 rounds
+  Area of Effect: The user
+
+THAC0: +2
+Damage: 1d6+2 (crushing)
+Speed Factor: 2
+Proficiency Type: Quarterstaff
+Type: Two-handed
+Requires:
+ 5 Strength
+
+Weight: 3~
+
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 6
 @39679 = ~Dragonslayer: Peridan
 Few dare to create items such as this, for who does not fear the wrath of dragons, and what action would more tempt their reckoning? Yet, at a time lost in Faerûn's past, there was a need, and this sword was forged in answer. Tempered by a wizard's skill, this blade protects the wielder from the fear they should rightly feel while staring down a dragon's maw. It also bolsters with regeneration, dispels the trickery of illusions, and dares to do double damage against the greatest creatures of the realms.
@@ -5424,6 +5634,31 @@ Weight: 3~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 1
 @39939 = ~So you obviously want me to assume the role. A marriage of convenience perhaps?~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@40018 = ~Not much is known about this katana; its true origin has been lost to time. The edge of the blade has been sharpened to perfection, giving the wielder a chance to slay an opponent with a single blow, unless they can somehow survive the sudden loss of their head. Markings engraved upon the hilt suggest that the sword is especially potent when used against creatures from the outer planes, while protective enchantments keep the wielder's mind clear of doubt and focus <PRO_HISHER> will. Who originally commissioned the creation of this weapon, or why, remains a mystery. Two words are etched into the blade itself: "Solemn Duty."
+
+STATISTICS:
+
+Equipped abilities:
+– Immunity to confusion
+
+Combat abilities:
+– 3% chance of decapitating an opponent on each hit
+
+THAC0: +3, +5 vs. outerplanar creatures
+Damage: 1d10+3, +2 magic damage vs. outerplanar creatures
+Damage Type: Slashing
+Speed Factor: 1
+Proficiency Type: Katana
+Type: One-handed
+Requires:
+ 6 Strength
+
+Weight: 3~
+
+// standardizing "outerplanar", "interplanar", and "extraplanar" to be one word without a hyphen
+@40195 = ~Outerplanar destroyed~
 
 // [automatic scan] Issues: 1  | Surplus trailing whitespace at line 3
 @40314 = ~Shapeshift: Werewolf

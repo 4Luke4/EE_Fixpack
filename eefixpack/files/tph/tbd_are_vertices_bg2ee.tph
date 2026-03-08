@@ -17,6 +17,17 @@ COPY_EXISTING ~ar0406.are~ ~override~
   END
   LPF cd_define_area_vertices INT_VAR bounding_left = 796 bounding_top = 837 bounding_right = 841 bounding_bottom = 905 
                               STR_VAR struct_name = Door25 struct_type = door_open END
+  BUT_ONLY  
+
+COPY_EXISTING ~ar0502.are~ ~override~ // fixes wonky container overlay for lightning trap
+  CLEAR_ARRAY cd_define_area_vertices_array
+  DEFINE_ASSOCIATIVE_ARRAY cd_define_area_vertices_array BEGIN
+    469, 374 => 0
+    599, 477 => 0
+    583, 495 => 0
+    450, 389 => 0
+  END
+  LPF cd_define_area_vertices STR_VAR struct_name = "Lightining Trap" struct_type = region END
   BUT_ONLY
 
 COPY_EXISTING ~ar0711.are~ ~override~
@@ -142,6 +153,7 @@ COPY_EXISTING ~ar2200.are~ ~override~
   END
   LPF cd_define_area_vertices INT_VAR bounding_left = 2126 bounding_top = 902 bounding_right = 2179 bounding_bottom = 988 launch_point_x = 2163 launch_point_y = 1559
                               STR_VAR struct_name = StairsD struct_type = region END
+  LPF ALTER_AREA_REGION INT_VAR flag_activation_point = 1 activate_x = 2240 activate_y = 1050 STR_VAR region_name = StairsD END
   BUT_ONLY 
     
 COPY_EXISTING ~ar3019.are~ ~override~
@@ -199,3 +211,31 @@ COPY_EXISTING ~ar5007.are~ ~override~
                               STR_VAR struct_name = Door01 struct_type = door_open END
   BUT_ONLY  
 
+COPY_EXISTING ~ar6002.are~ ~override~
+  CLEAR_ARRAY cd_define_area_vertices_array
+  DEFINE_ASSOCIATIVE_ARRAY cd_define_area_vertices_array BEGIN
+    1695, 442 => 0
+    1675, 485 => 0
+    1675, 413 => 0
+    1695, 370 => 0
+  END
+  LPF cd_define_area_vertices INT_VAR bounding_left = 1675 bounding_top = 370 bounding_right = 1695 bounding_bottom = 485 
+                              STR_VAR struct_name = Door01 struct_type = door_open END
+  BUT_ONLY  
+
+COPY_EXISTING ~ar6105.are~ ~override~
+  CLEAR_ARRAY cd_define_area_vertices_array
+  DEFINE_ASSOCIATIVE_ARRAY cd_define_area_vertices_array BEGIN
+    503, 627 => 0
+    457, 599 => 0
+    457, 533 => 0
+    462, 526 => 0
+    469, 524 => 0
+    481, 526 => 0
+    495, 537 => 0
+    499, 544 => 0
+    503, 556 => 0
+  END
+  LPF cd_define_area_vertices INT_VAR bounding_left = 457 bounding_top = 524 bounding_right = 503 bounding_bottom = 627 
+                              STR_VAR struct_name = Door01 struct_type = door_open END
+  BUT_ONLY  

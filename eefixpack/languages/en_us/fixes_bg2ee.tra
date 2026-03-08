@@ -32,6 +32,100 @@ It should be "south of the battlefield", not "north of the battlefield".
 */
 @7421   = ~Aye, south of the battlefield as he had said. You make the correct choice, <CHARNAME>.~
 
+// ninja-to to Ninjatō
+@7529 = ~Ninjatō~
+@7530 = ~Ninjatō~
+@7531 = ~Ninjatō +1~
+
+// remove the line about the save penalty for water/plants since it's not implemented
+@7680 = ~Abi-Dalzim's Horrid Wilting
+(Necromancy) 
+
+Level: 8
+Range: Visual range of the caster 
+Duration: Instant
+Casting Time: 8
+Area of Effect: 15-ft. radius
+Saving Throw: 1/2
+
+This spell evaporates moisture from the bodies of every living creature within the area of effect, inflicting 1d8 damage per level of the caster. Affected creatures are allowed a Saving Throw vs. Spell for half damage. This spell will not harm party members.~
+
+// no change to the text, just added the REPUP sound reference
+@10468 = ~Your donation to the church was greatly appreciated, and your reputation has gone up by one point.~ [REPUP]
+
+// shield of the archons cannot be dispelled, but it also doesn't absorb dispel - just use strref 15965 from iwdee
+@11015 = ~Shield of the Archons
+(Abjuration)
+
+Level: 7
+Sphere: Protection
+Range: Touch
+Duration: 3 rounds/level
+Casting Time: 9
+Area of Effect: The caster
+Saving Throw: None
+
+This powerful abjuration spell causes the spells cast against the priest to be absorbed and consumed. This affects a total number of spell levels equal to half the level of the caster. It includes spells cast from scrolls and innate spell-like abilities, but excludes area effects that are not centered directly upon the priest and area effects that are stationary, such as Cloudkill and Stinking Cloud.
+
+As long as there are levels remaining, the spell will be absorbed. For example, if there is only 1 level left and a 3rd-level spell is cast at the priest, the spell will be absorbed while canceling the shield.
+
+This spell will not protect the caster from Dispel Magic, but it will not be dispelled by Dispel Magic either.~
+/*
+jazira
+It should be "southeast", not "south".
+*/
+@11195  = ~Take them to the Fairy Queen who lives in the southeast end of the Windspear Hills. This will be our deliverance from this... this Irenicus and his dungeon!~
+
+/*
+jazira
+It should be "southeast", not "south".
+*/
+@11354  = ~Thank you! You must take the acorns and deliver them to the Fairy Queen in the southeast end of the Windspear Hills.~
+
+/*
+jazira
+It should be "southeast", not "south".
+*/
+@11381  = ~If you take the acorns to the Fairy Queen, then she can regrow our trees and free us! She lives in the southeast end of the Windspear Hills! Will you do this for us?~
+
+/*
+jazira
+It should be "Soldier", not "Soldiers".
+*/
+@11488  = ~Tombelthen Soldier~
+
+/*
+jazira
+It should be "Soldier", not "Soldiers".
+*/
+@11489  = ~Tombelthen Soldier~
+
+// strike the last sentence about acting as a +1 weapon--it's a spell that just does damage, not a summoned weapon
+@12317 = ~Magical Stone
+(Enchantment)
+
+Level: 1
+Sphere: Combat 
+Range: 50 ft.
+Duration: Instant
+Casting Time: 4 
+Area of Effect: 1 creature
+Saving Throw: None 
+
+By using this spell, the priest can create a small magical pebble, which then flies out and hits a target opponent. The stone deals 1d4 points of damage to whomever it hits.~
+
+/*
+jazira
+The audio file associated should be "[SURGN03]", not "[STORE05]".
+*/
+@12433 = ~[THE SURGEON 3]~ [SURGN03]
+
+/*
+jazira
+The audio file associated should be "[SURGN04]", not "[STORE06]".
+*/
+@12434 = ~[THE SURGEON 4]~ [SURGN04]
+
 // last line: the ruins are west of imnesvale, not north
 @17169 = ~Wallag,
 We travel this day to search out the wolf lair. My own scouting of the region has confirmed Merella's suspicions that there is a large pack of wolves acting in this area. On the map included, I have indicated where I believe the wolf den to be located. Follow us if you can, but be cautious. We can ill-afford another mysterious disappearance. Until we meet again. 
@@ -40,12 +134,67 @@ Mazzy
 
 (On the same sheet is drawn a crude but effective map which indicates the path to a forested area several hours west of the Imnesvale region.)~
 
+/*
+jazira
+It should be "who lives in the southeast end of the Windspear Hills", not "who lives northeast of the human settlement called Trademeet".
+*/
+@17759  = ~You have done a noble thing for us. Please take these acorns to the Fairy Queen who lives in the southeast end of the Windspear Hills, just northeast of the human settlement called Trademeet.~
+
+/*
+jazira
+It should be "southeast", not "south".
+*/
+@17774  = ~You have done a noble thing for us. Please take these acorns to the Fairy Queen who lives in the southeast end of the Windspear Hills.~
+
+/*
+jazira
+It should be "southeast", not "south".
+*/
+@17788  = ~You have done a noble thing for us. Please take these acorns to the Fairy Queen who lives in the southeast end of the Windspear Hills.~
+
+// no change to the text, just added the REPUP sound reference
+@19686 = ~The Party's Reputation Has Increased~ [REPUP]
+
 // second line: the ruins are west of imnesvale, not east
 @19723 = ~This is half of a page of parchment, yellowed with age, the ink faded but still legible, and reads:
 
 "This land near the Umar Hills is rich with mithral deposits, but unfortunately too many scoundrels and bandits have noted this and are preying upon the prospectors in the area with a vengeance. I have found an excellent hiding place for my mithral cache, one that those thieves are sure not to find. It is far to the west of Imnesvale village, in a forest—"
 
 Below this section, the page is torn and jagged, as if it has been ripped from its other half.~
+
+// archer's hit/damage bonuses change after level 18
+@25209 = ~ARCHER: The Archer is the epitome of skill with the bow—the ultimate marks<PRO_MANWOMAN>, able to make almost any shot, no matter how difficult. To become so skilled with the bow, the Archer has had to sacrifice some of <PRO_HISHER> proficiency with melee weapons and armor.
+
+Advantages:
+– +1 to hit and damage rolls with any missile weapon every 3 levels through level 18.
+– +1 to hit and damage rolls with any missile weapon every 5 levels from level 23 onwards.
+– May achieve Grand Mastery (5 slots) in longbows, shortbows, and crossbows.
+– May use the Called Shot ability once per day. Gains one use at level 4 and an additional use every 4 levels thereafter.
+
+CALLED SHOT: All successful ranged attacks within the next 10 seconds have the following cumulative effects besides normal damage, according to the level of the Archer:
+ 4th level: -1 penalty to target's THAC0.
+ 8th level: -1 penalty to target's Saving Throws vs. Spell.
+ 12th level: -1 penalty to the target's Strength score.
+ 16th level: +2 bonus to damage roll.
+
+Disadvantages:
+– May only wear leather, studded leather, and hide armor.
+– May only become Proficient (one slot) with melee weapons.
+– May not use the Charm Animal ability.~
+
+// make protection from evil 10' actually be 10'
+@22832 = ~Protection From Evil, 10' Radius
+(Abjuration)
+
+Level: 4
+Sphere: Protection
+Range: Touch
+Duration: 1 turn/level
+Casting Time: 7
+Area of Effect: 10-ft. radius
+Saving Throw: None
+
+When this spell is cast, all allied creatures within a 10-ft. radius are affected individually by Protection From Evil. It creates a magical barrier around the recipients at a distance of one foot. The barrier moves with the recipient and has two major effects: First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of -2 to each attack roll. Second, summoned demons cannot target protected creatures.~
 
 /*
 jazira
@@ -73,6 +222,114 @@ Saving Throw: None
 
 There are two parts to this spell. First, a small portal opens and summons one or two carrion crawlers to a point designated by the wizard. Second, the magic mutates the carrion crawlers into larger, more vicious versions of themselves. The wizard now has control over these creature(s) until they are slain or the spell's duration expires. There is a 35% chance that two carrion crawlers will be summoned instead of one.~
 
+// using iwdee's summon nishruu; see @35786 in your local copy_from_iwdee.tra
+@29214 = ~Summon Nishruu
+(Conjuration/Summoning)
+
+Level: 6
+Range: 25 ft.
+Duration: 1 round/level
+Casting Time: 9
+Area of Effect: Special
+Saving Throw: None
+
+By casting Summon Nishruu, a wizard calls into existence a magical being of considerable power: the nishruu. At first glance, this appears to be some sort of mist, but upon closer examination, this boiling, churning gray mass of vapors and shapes moves with a life of its own. Drawn toward magic like a moth to the flame, the nishruu feeds on the energies surrounding and used by wizards. Luckily, there is no question as to the loyalty of the creature, and it will not attack its summoner even though it would like nothing better.
+
+The nishruu has no physical attacks at all, although physical attacks can hurt it. Each time a nishruu touches a target wizard and wraps its tendrils around <PRO_HIMHER>, two things happen: First, all magical items with charges in the possession of the target will be drained by 1 charge, destroying them if only 1 charge was left; second, the wizard loses 1 random spell of the highest level currently memorized. The nishruu is completely immune to energy damage, and magic will actually heal it. The creature will remain under the wizard's control until slain or until the spell's duration expires.~
+
+/*
+jazira
+It should be "duergar", not "dwarf".
+*/
+@34092  = ~Helping Irenicus's captive dryads
+
+I have agreed to help a trio of dryads return their acorns to the Fairy Queen. Somewhere in the dungeon is a duergar by the name of Ilyich who has the acorns.~
+
+// book of infinite spells casts true sight, not true seeing
+// copy-paste true sight descript from strref 25936 
+@39430 = ~This ancient tome creaks as you open it. Each page of the Book of Infinite Spells contains a spell described in layman's terms, easy enough for a thief, a cleric, or even a fighter to understand and cast it. Each spell on a page can be cast once per day.
+
+A second function of the book is to turn to a different page of the book. This allows for the possibility of getting a better spell. However, once the page has been turned, the previous spell is lost forever unless it happens to appear again.
+
+Be warned: Once you turn to the last page of the book, you are stuck with that spell.
+
+The spell on this page is:
+
+True Sight
+(Divination)
+
+Level: 6
+Range: 0
+Duration: 1 turn
+Casting Time: 8
+Area of Effect: 120-ft. radius
+Saving Throw: None 
+
+When this spell is cast, an area roughly 120 ft. in radius around the caster will be affected. Instantly and once per round for 1 turn after this spell is cast, all hostile Illusion/Phantasm spells in the area of effect will be dispelled. The spells that are affected by this are Reflected Image, Invisibility, Mirror Image, Non-Detection, Improved Invisibility, Shadow Door, Mislead, Project Image, and Simulacrum. The area of effect is roughly a 120-ft. radius around the caster. The target's Magic Resistance, if any, does not come into effect with this spell. This spell only affects enemies, thus it is unable to dispel invisibility from a party member.~
+
+// book of infinite spells
+// copy-paste the lightning bolt description from strref 12179
+@39437 = ~This ancient tome creaks as you open it. Each page of the Book of Infinite Spells contains a spell described in layman's terms, easy enough for a thief, a cleric, or even a fighter to understand and cast it. Each spell on a page can be cast once per day.
+
+A second function of the book is to turn to a different page of the book. This allows for the possibility of getting a better spell. However, once the page has been turned, the previous spell is lost forever unless it happens to appear again.
+
+Be warned: Once you turn to the last page of the book, you are stuck with that spell.
+
+The spell on this page is:
+
+Lightning Bolt
+(Evocation) 
+
+Level: 3
+Range: 70 ft.
+Duration: Instant 
+Casting Time: 3 
+Area of Effect: Path of bolt
+Saving Throw: 1/2
+
+Upon casting this spell, the wizard releases a powerful stroke of electrical energy that inflicts 1d6 points of damage per level of the caster (maximum damage of 10d6) to each creature within its area of effect. A successful Saving Throw vs. Spell reduces this damage to half (round fractions down). If the lightning bolt intersects with a wall, it will bounce until it reaches its full length.~
+
+// monk AC bonus progression changes at levels 23 and 35
+@45867 = ~MONK: Monks are warriors who pursue perfection through contemplation as well as action. They are versatile fighters, especially skilled in combat without weapons or armor. Though Monks cannot cast spells, they have a unique magic of their own: They channel a subtle energy, called ki, which allows them to perform amazing feats. The Monk's best known feat is their ability to stun an opponent with an unarmed blow.
+
+CLASS FEATURES:
+
+– May not wear any armor.
+– May only use weapons available to the Thief class (except two-handed).
+– May only become Proficient (one slot) in any weapon class.
+– May only become Proficient (one slot) in Single-Weapon Style and may not put slots into any other style.
+– Moves 2 points faster than other characters. Movement rate further improves by 1 every 5 levels.
+– May make 1 unarmed attack per round. An additional 1/2 attack per round is gained every 3 levels. Damage dealt by unarmed attacks increases with level as follows:
+  Level 1-2: 1d6
+  Level 3-5: 1d8
+  Level 6-8: 1d10
+  Level 9-14: 1d12
+  Level 15+: 1d20
+– At level 9, unarmed attacks are treated as a +1 magical weapon and gain a +1 bonus to hit and damage rolls. This enchantment improves to +2 at level 12, +3 at level 15, and +4 at level 25. 
+– Receives a +2 bonus to Saving Throws vs. Spell.
+– Deflect Missiles: +1 bonus to AC vs. missile attacks every 3 levels.
+– Starts with an Armor Class of 9 at 1st level and gains an additional +1 bonus every 2 levels through level 18.
+– Gains an additional +1 AC bonus every 3 levels from level 21 through level 30.
+– Gains an additional +1 AC bonus every 5 levels from level 35 onwards.
+– May use the Stunning Blow ability once per day. Gains one use at level 1 and an additional use every 4 levels thereafter.
+
+STUNNING BLOW: All successful attacks within the next round force the victim to save vs. Spell or be stunned. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 5th level: Becomes immune to all diseases and cannot be slowed or hasted.
+– 7th level: May use the Lay On Hands ability on <PRO_HIMHER>self to heal 2 Hit Points per level.
+– 8th level: Gains a -1 bonus to Speed Factor.
+– 9th level: Gains a +1 bonus to all Saving Throws and becomes immune to charm.
+– 11th level: Becomes immune to poison.
+– 12th level: Gains another -1 bonus to Speed Factor.
+– 13th level: May use the Quivering Palm ability once per day.
+
+QUIVERING PALM: The next successful attack forces the opponent to save vs. Spell or die. This special ability automatically modifies normal attacks; no targeting needs to be done.
+
+– 14th level: Gains 3% Magic Resistance per level (starting with 42% at 14th level).
+– 20th level: Becomes immune to non-magical weapons.
+– Alignment restricted to lawful.
+– Hit Die: d8~
+
 /*
 jazira
 It should be "Ma Jansen", not "Ma Jensen".
@@ -84,6 +341,24 @@ jazira
 It should be "could elicit a response", not "could illicit a response".
 */
 @48747  = ~Not interested in her, or not interested in women? I do so wonder, ranger, if even my charms could elicit a response on behalf of females everywhere...~
+
+// remove 'only usable by tieflings' bit from the flavor tet
+@51947 = ~This +2 abyssal greensteel blade is one of Haer'Dalis's favorite weapons. This short sword is capable of inflicting an additional 3 points of poison damage if the target fails a Saving Throw.
+
+STATISTICS:
+
+Combat abilities:
+– Hit target must save vs. Poison or suffer 3 points of poison damage
+
+THAC0: +2
+Damage: 1d6+2 (piercing)
+Speed Factor: 1
+Proficiency Type: Short Sword
+Type: One-handed
+Requires:
+ 4 Strength
+
+Weight: 2~
 
 // this item's name should state its enchantment level
 @57918 = "Paralytic Bolt +1"

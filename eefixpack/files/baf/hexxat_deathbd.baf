@@ -1,0 +1,14 @@
+IF
+  StateCheck("hexxat",STATE_DEAD)  // Hexxat
+  GlobalTimerExpired("OHH_RESTORE","GLOBAL")
+  CombatCounter(0)
+  HasItem("ohhcask2",Player%index%)
+  NextTriggerObject(Player%index%)
+  ActionListEmpty()
+THEN
+  RESPONSE #100
+    SetGlobal("OHH_RESTORE_HEXXAT","GLOBAL",1)
+    MoveGlobalObject("hexxat",Player%index%)  // Hexxat
+    ApplySpell("hexxat",CLERIC_RESURRECTION)  // Hexxat
+    ApplySpell("hexxat",RESTORE_FULL_HEALTH)  // Hexxat
+END
